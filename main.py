@@ -48,7 +48,7 @@ async def flipoff(interaction: discord.Interaction, target: discord.User):
 @madness_group.command(name="kill", description="kill a user")
 async def kill(interaction: discord.Interaction, target: discord.User):
     embed = discord.Embed(
-        title=f" {interaction.user.display_name} completely erased {target.display_name} 💀",
+        title=f" {interaction.user.display_name} kills {target.display_name} 💀💀",
         description="DIE BITCH",
         color=discord.Color.dark_red()
     )
