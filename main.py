@@ -25,6 +25,52 @@ intents.message_content = True  # Required to read chat messages for song names
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# --- MADNESS REACTION COMMANDS GROUP ---
+class MadnessGroup(app_commands.Group):
+    def __init__(self):
+        super().__init__(name="madness", description="Mario's Madness interaction reactions")
+
+madness_group = MadnessGroup()
+
+# 1. Flip Off Command
+@madness_group.command(name="flipoff", description="flip off an annoying user")
+async def flipoff(interaction: discord.Interaction, target: discord.User):
+    embed = discord.Embed(
+        title=f" {interaction.user.display_name} flips off {target.display_name} <:fuckyoumx:1538591235927965726>",
+        description="*Well, that's not very nice!*",
+        color=discord.Color.red()
+    )
+    # Put your direct image URL here
+    embed.set_image(url="https://i.pinimg.com/736x/d5/08/12/d5081271cdf82eb695611f101342db7b.jpg")
+    await interaction.response.send_message(embed=embed)
+
+# 2. Kill / Defeat Command
+@madness_group.command(name="kill", description="kill a user")
+async def kill(interaction: discord.Interaction, target: discord.User):
+    embed = discord.Embed(
+        title=f" {interaction.user.display_name} completely erased {target.display_name} 💀",
+        description="*DIE!!!*",
+        color=discord.Color.dark_red()
+    )
+    # Put image URL for Ultra M / Horror Mario killing
+    embed.set_image(url="https://i.pinimg.com/736x/bc/a7/35/bca735ecf4b651b7fabd80c5ea785ec4.jpg")
+    await interaction.response.send_message(embed=embed)
+
+# 3. Laugh Command
+@madness_group.command(name="laugh", description="laugh ur ass off at a user")
+async def laugh(interaction: discord.Interaction, target: discord.User):
+    embed = discord.Embed(
+        title=f" {interaction.user.display_name} laughs at {target.display_name}! ",
+        description="*LMAO*",
+        color=discord.Color.gold()
+    )
+    # Put image URL here
+    embed.set_image(url="https://i.pinimg.com/736x/5f/e6/8c/5fe68c736527cba5a324626ec0943394.jpg")
+    await interaction.response.send_message(embed=embed)
+
+# Register the group with the bot
+bot.tree.add_command(madness_group)
+
 # --- SONG TRIGGERS (Longer phrases placed first) ---
 SONG_TRIGGERS = {
     "its a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
