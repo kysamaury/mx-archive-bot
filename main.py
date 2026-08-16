@@ -29,7 +29,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.tree.command(name="help", description="Learn how to use MX Archive")
 async def help_command(interaction: discord.Interaction):
     embed = discord.Embed(
-        title="🎮 MX Archive — Bot Help Menu",
+        title="<:mxsmile:1538591783645220965> MX Archive - Help Menu",
         description="Here is everything you can do with MX Archive! <:mxflower:1538616023928799363>",
         color=discord.Color.red()
     )
