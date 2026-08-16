@@ -28,8 +28,10 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 # --- SONG TRIGGERS (Longer phrases placed first) ---
 SONG_TRIGGERS = {
     "its a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
+    "it's a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
     "starman slaughter": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571763284451488/starman.gif?ex=6a832a1d&is=6a81d89d&hm=180c763376acb2b4d1dce7ebd9a26bdedae9fef7982f05759b6dc6a31c4549c9&",
     "all stars": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579080994099240/all-stars.gif?ex=6a8330ee&is=6a81df6e&hm=caa074d312050a922bdb876e70d2b75a3ed986e50f51d16260cf6f793aee69ee&",
+    "all-stars": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579080994099240/all-stars.gif?ex=6a8330ee&is=6a81df6e&hm=caa074d312050a922bdb876e70d2b75a3ed986e50f51d16260cf6f793aee69ee&",
     "all star": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579673686999150/all-stars-2.gif?ex=6a83317b&is=6a81dffb&hm=009bc0e3707e30f0e4d5ea0f02401791a309c3d4219f408265300dfbbb268138&",
     "so cool": "https://cdn.discordapp.com/attachments/1538562192952266783/1538568501940322315/so_cool.gif?ex=6a832714&is=6a81d594&hm=dd18a7bcc141fa0210b2c3ca5bfbe31386f8af12610e060833f4e875db34f1c2&",
     "mario sing and game rhythm 9": "https://cdn.discordapp.com/attachments/1538562192952266783/1538567838879457320/msagr.gif?ex=6a832675&is=6a81d4f5&hm=e83769ac2b6b4c0ad4f85c703fc8491185b528f9490226573b4735d46ea1fdba&",
@@ -39,6 +41,7 @@ SONG_TRIGGERS = {
     "oh god no": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570662778507344/oh-god-no.gif?ex=6a832917&is=6a81d797&hm=4bed85b274b3bc9629b4eb3a847abd6293535e14917c1940ad2206aeddcefa25&",
     "ogn": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570662778507344/oh-god-no.gif?ex=6a832917&is=6a81d797&hm=4bed85b274b3bc9629b4eb3a847abd6293535e14917c1940ad2206aeddcefa25&",
     "i hate you": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&",
+    "i hate u": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&",
     "ihy": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&",
     "thalassophobia": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571619893514330/thalassaphobia.gif?ex=6a8329fb&is=6a81d87b&hm=9109f505c83d27dc24daf9df7baf4d21f64dc3a20c7888ce79ce91ba42c7a9c0&",
     "apparition": "https://cdn.discordapp.com/attachments/1538562192952266783/1538576341899939920/apparition.gif?ex=6a832e61&is=6a81dce1&hm=05e99f2d2f8ae7eda7089ef62022dc70c0ff1b7f7334b8a270cd929cc6804366&",
