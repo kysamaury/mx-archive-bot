@@ -25,7 +25,7 @@ intents.message_content = True  # Required to read chat messages for song names
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# Add all your song triggers here!
+# --- SONG TRIGGERS (Longer phrases placed first) ---
 SONG_TRIGGERS = {
     "its a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
     "starman slaughter": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571763284451488/starman.gif?ex=6a832a1d&is=6a81d89d&hm=180c763376acb2b4d1dce7ebd9a26bdedae9fef7982f05759b6dc6a31c4549c9&",
@@ -46,16 +46,16 @@ SONG_TRIGGERS = {
     "dark forest": "https://cdn.discordapp.com/attachments/1538562192952266783/1538576092569538600/dark-forest.gif?ex=6a832e25&is=6a81dca5&hm=666306bfb51d53319370bd5716b0833aba545218aa41d8e1be12261b32bc696d&",
     "bad day": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577767203999774/bad-day.gif?ex=6a832fb5&is=6a81de35&hm=13f360346131158fd12b4c9311e30372c323340d03a098f3c01778415cebaf7c&",
     "day out": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577980752789645/day-out.gif?ex=6a832fe8&is=6a81de68&hm=fde2cd1ddc80281045abbaa9249fe56c6875cfc1337baadbeb2ec73fecde5831&",
-    "dictator": "https://cdn.discordapp.com/attachments/1538562192952266783/1538578294423691327/dictator.gif?ex=6a833032&is=6a81deb2&hm=ba747fab5dceb8e99ce0fed8c8d8ab37d2f5cb7e5c83fddf891388e4bd0d33fe&",
     "dictators": "https://cdn.discordapp.com/attachments/1538562192952266783/1538578294423691327/dictator.gif?ex=6a833032&is=6a81deb2&hm=ba747fab5dceb8e99ce0fed8c8d8ab37d2f5cb7e5c83fddf891388e4bd0d33fe&",
+    "dictator": "https://cdn.discordapp.com/attachments/1538562192952266783/1538578294423691327/dictator.gif?ex=6a833032&is=6a81deb2&hm=ba747fab5dceb8e99ce0fed8c8d8ab37d2f5cb7e5c83fddf891388e4bd0d33fe&",
     "race traitors": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573362819768383/race-traitors.gif?ex=6a832b9b&is=6a81da1b&hm=37a88957ca526100f173f67c9d19718c889f55ad61b717e4423d706a478bebed&",
     "race traitor": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573362819768383/race-traitors.gif?ex=6a832b9b&is=6a81da1b&hm=37a88957ca526100f173f67c9d19718c889f55ad61b717e4423d706a478bebed&",
     "no hope": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573901091700869/no-hope.gif?ex=6a832c1b&is=6a81da9b&hm=c81009902dea388ab0330b18e981734d7b120ed508c7eca0d7b958420e12f526&",
     "no party": "https://cdn.discordapp.com/attachments/1538562192952266783/1538574841542610984/no-party.gif?ex=6a832cfb&is=6a81db7b&hm=c44ec259b55379839473a86497f484311eb71469c4d6256b97a40086ead3ac05&",
     "piracy": "https://cdn.discordapp.com/attachments/1538562192952266783/1538574841542610984/no-party.gif?ex=6a832cfb&is=6a81db7b&hm=c44ec259b55379839473a86497f484311eb71469c4d6256b97a40086ead3ac05&",
     "golden land": "https://cdn.discordapp.com/attachments/1538562192952266783/1538578988723863602/golden-land.gif?ex=6a8330d8&is=6a81df58&hm=07b99c671bd02407ccff2ed55bec845813dd0aa823dd64421efd3c85b0f4e6fe&",
-    "paranoia": "https://cdn.discordapp.com/attachments/1538562192952266783/1538572322762657832/paranoia.gif?ex=6a832aa3&is=6a81d923&hm=b378de278400c4c4c519eedea61b343e39c4ae953703fbd5999a0caa4d3bb61e&",
     "paranoid": "https://cdn.discordapp.com/attachments/1538562192952266783/1538572322762657832/paranoia.gif?ex=6a832aa3&is=6a81d923&hm=b378de278400c4c4c519eedea61b343e39c4ae953703fbd5999a0caa4d3bb61e&",
+    "paranoia": "https://cdn.discordapp.com/attachments/1538562192952266783/1538572322762657832/paranoia.gif?ex=6a832aa3&is=6a81d923&hm=b378de278400c4c4c519eedea61b343e39c4ae953703fbd5999a0caa4d3bb61e&",
     "too late": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575627756765186/overdue.gif?ex=6a832db7&is=6a81dc37&hm=77d9c40349d6cc7c2634a4c83bbc98d36a5c8242a396d66b2a6661bb4e95d295&",
     "overdue": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575627756765186/overdue.gif?ex=6a832db7&is=6a81dc37&hm=77d9c40349d6cc7c2634a4c83bbc98d36a5c8242a396d66b2a6661bb4e95d295&",
     "powerdown": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573982066941982/powerdown.gif?ex=6a832c2e&is=6a81daae&hm=54d43134f178ae06502b55284b1f8da6e0f50c7d772471acd4b38608a8452544&",
@@ -63,9 +63,8 @@ SONG_TRIGGERS = {
     "promotion": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573354964094976/promotion.gif?ex=6a832b99&is=6a81da19&hm=e148160af159b597f97768dc8d0eb4079f9a3979228d530cde3c0cbc280c5f40&",
     "abandoned": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575345710800906/abandoned.gif?ex=6a832d73&is=6a81dbf3&hm=ec12d889fff070d6ad079254142ae90d4453a00f717daa579ff44a6d72c475ef&",
     "the end": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575019989270619/the-end.gif?ex=6a832d26&is=6a81dba6&hm=9be2b19d4c43fe8d87ad7f65e90742073716c7d913a85a93766aab504d9a40ea&",
-    "unbeatable": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579693593436242/unbeatable.gif?ex=6a833180&is=6a81e000&hm=1f76bb83c1cdbcc0dde6c77a138f29e2628b62498d338530f7ae651f55a8379e&",
     "you cannot beat us": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579929111994498/you-cannot-beat-us.gif?ex=6a8331b8&is=6a81e038&hm=9dfeed19d695b8b8d5ac37b1ce2fa09cf1e5bf3b732d932aca25bb3067e84fd0&",
-    
+    "unbeatable": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579693593436242/unbeatable.gif?ex=6a833180&is=6a81e000&hm=1f76bb83c1cdbcc0dde6c77a138f29e2628b62498d338530f7ae651f55a8379e&"
 }
 
 @bot.event
@@ -101,6 +100,7 @@ async def on_message(message: discord.Message):
             break
 
     await bot.process_commands(message)
+
 # --- EMBED BUILDER COMMAND ---
 class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
     embed_title = discord.ui.TextInput(label="Title", placeholder="Enter embed title...", required=True)
