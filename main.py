@@ -81,7 +81,7 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-# --- CHAT LISTENER FOR SONG TRIGGERS ---
+# --- CHAT LISTENER FOR SONG TRIGGERS AND CUSTOM RESPONSES ---
 @bot.event
 async def on_message(message: discord.Message):
     if message.author.bot:
@@ -89,6 +89,12 @@ async def on_message(message: discord.Message):
 
     content_lower = message.content.lower()
 
+    # Special trigger for MX
+    if "i hate mx" in content_lower:
+        await message.channel.send("Fuck you")
+        return
+
+    # Check for song gif triggers
     for song_title, gif_url in SONG_TRIGGERS.items():
         if song_title in content_lower:
             embed = discord.Embed(
