@@ -160,17 +160,24 @@ SONG_TRIGGERS = {
 
 @bot.event
 async def on_ready():
-    # Set status to Do Not Disturb (red dot) with custom playing text
-    await bot.change_presence(
-        status=discord.Status.dnd,
-        activity=discord.Game(name="Mario's Madness v2")
+    # Set status to Do Not Disturb and Activity to Listening to /help
+    activity = discord.Activity(
+        type=discord.ActivityType.listening, 
+        name="/help"
     )
-    print(f'Logged in as {bot.user}!')
+    await bot.change_presence(
+        status=discord.Status.dnd, 
+        activity=activity
+    )
+    
+    # Sync slash commands
     try:
         synced = await bot.tree.sync()
         print(f"Synced {len(synced)} command(s)")
     except Exception as e:
-        print(e)
+        print(f"Failed to sync commands: {e}")
+        
+    print(f"Logged in as {bot.user.name}!")
 
 # --- CHAT LISTENER FOR SONG TRIGGERS AND CUSTOM RESPONSES ---
 @bot.event
