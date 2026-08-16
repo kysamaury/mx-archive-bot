@@ -30,27 +30,27 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def help_command(interaction: discord.Interaction):
     embed = discord.Embed(
         title="🎮 MX Archive — Bot Help Menu",
-        description="Here is everything you can do with MX Archive! <:mxsmile:1538591783645220965>",
+        description="Here is everything you can do with MX Archive! ",
         color=discord.Color.red()
     )
     
     # Section 1: Madness Reactions
     embed.add_field(
-        name="<:mx:1538614409902170212> `/madness` commands",
+        name="• <:mx:1538614409902170212> - `/madness` commands",
         value=(
             "`/madness flipoff @user` - Flip off a user\n"
             "`/madness kill @user` - Kill a user\n"
             "`/madness laugh @user` - Laugh at a user\n"
-            "*(More reaction commands coming soon! <:mxflower:1538616023928799363> )*"
+            "*(More reaction commands coming soon! )*"
         ),
         inline=False
     )
     
     # Section 2: Automatic Song & Message Triggers
     embed.add_field(
-        name="<:music:1538614127659061359> Automatic Triggers (Chat)",
+        name="• <:music:1538614127659061359> - Automatic Triggers (Chat)",
         value=(
-            "• Mention song names in chat (e.g. `starman slaughter`, `all stars`, `its a me`) to play GIF embeds!\n"
+            "• Mention song names in chat (example: `starman slaughter`, `all stars`, `its a me`) to play gif embeds!\n"
             "• Try saying `i hate mx` in chat if you dare... <:mxsmile:1538591783645220965>"
         ),
         inline=False
@@ -58,12 +58,12 @@ async def help_command(interaction: discord.Interaction):
     
     # Section 3: Admin Tools
     embed.add_field(
-        name="<:mushroome:1538614584435277996> embeds",
-        value="• Embed Builder for anything idc. ",
+        name="• <:mushroome:1538614584435277996> - embeds",
+        value="• Embed Builder for anything u want lol. ",
         inline=False
     )
     
-    embed.set_footer(text="MX Archive - Mario's Madness Bot")
+    embed.set_footer(text="MX Archive - Mario's Madness Bot by <@1006227921570107414> <:mxflower:1538616023928799363>")
     
     await interaction.response.send_message(embed=embed)
     
