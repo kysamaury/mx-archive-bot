@@ -91,7 +91,7 @@ async def on_message(message: discord.Message):
 
     # Special trigger for MX
     if "i hate mx" in content_lower:
-        await message.channel.send("Fuck you")
+        await message.channel.send("Fuck you <:fuckyoumx:1538591235927965726>")
         return
 
     # Check for song gif triggers
