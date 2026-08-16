@@ -27,15 +27,52 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Add all your song triggers here!
 SONG_TRIGGERS = {
-    "oh god no": "https://www.youtube.com/watch?v=DcqLAtdYfU0&pp=ygUWb2ggZ29kIG5vIGZuZiA%3D%3D",
-    "mario sing and game rhythm 9": "https://www.youtube.com/watch?v=4LvyiLJh5pA&list=RD4LvyiLJh5pA&start_radio=1&pp=ygUnbWFyaW8gc2luZyBhbmQgZ2FtZSByaHl0aG0gOSBmbmY%3D",
-    "i hate you": "https://www.youtube.com/watch?v=gHMCdfcpE7M&pp=ygUXaSBoYXRlIHlvdSBmbmY%3D",
-    "paranoia": "https://klipy.com/gifs/marios-madness-fnf"
+    "its a me": ",
+    "starman slaughter": "",
+    "all stars": "https://www.youtube.com/watch?v=gHMCdfcpE7M&pp=ygUXaSBoYXRlIHlvdSBmbmY%3D",
+    "all star": "https://klipy.com/gifs/marios-madness-fnf",
+    "so cool": "https://cdn.discordapp.com/attachments/1538562192952266783/1538568501940322315/so_cool.gif?ex=6a832714&is=6a81d594&hm=dd18a7bcc141fa0210b2c3ca5bfbe31386f8af12610e060833f4e875db34f1c2&",
+    "mario sing and game rhythm 9": "https://cdn.discordapp.com/attachments/1538562192952266783/1538567838879457320/msagr.gif?ex=6a832675&is=6a81d4f5&hm=e83769ac2b6b4c0ad4f85c703fc8491185b528f9490226573b4735d46ea1fdba&",
+    "nourishing blood":
+    "alone":
+    "oh god no":
+    "ogn":
+    "i hate you":
+    "ihy":
+    "thalassophobia":
+    "apparition":
+    "last course":
+    "dark forest":
+    "bad day":
+    "day out":
+    "dictator":
+    "race traitors":
+    "race traitor":
+    "no hope":
+    "no party":
+    "piracy":
+    "golden land":
+    "paranoia":
+    "paranoid":
+    "too late":
+    "overdue":
+    "powerdown":
+    "demise":
+    "promotion":
+    "abandoned":
+    "the end":
+    "unbeatable":
+    "you cannot beat us":
+    
 }
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Game(name="Mario's Madness v2"))
+    # Set status to Do Not Disturb (red dot) with custom playing text
+    await bot.change_presence(
+        status=discord.Status.dnd,
+        activity=discord.Game(name="Mario's Madness v2")
+    )
     print(f'Logged in as {bot.user}!')
     try:
         synced = await bot.tree.sync()
@@ -51,13 +88,17 @@ async def on_message(message: discord.Message):
 
     content_lower = message.content.lower()
 
-    for song_title, video_url in SONG_TRIGGERS.items():
+    for song_title, gif_url in SONG_TRIGGERS.items():
         if song_title in content_lower:
-            await message.channel.send(f"👀 **Did someone say `{song_title.title()}`?**\n{video_url}")
+            embed = discord.Embed(
+                title=f"👀 Did someone say {song_title.title()}?",
+                color=discord.Color.red()
+            )
+            embed.set_image(url=gif_url)
+            await message.channel.send(embed=embed)
             break
 
     await bot.process_commands(message)
-
 # --- EMBED BUILDER COMMAND ---
 class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
     embed_title = discord.ui.TextInput(label="Title", placeholder="Enter embed title...", required=True)
