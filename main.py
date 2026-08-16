@@ -37,7 +37,7 @@ madness_group = MadnessGroup()
 async def flipoff(interaction: discord.Interaction, target: discord.User):
     embed = discord.Embed(
         title=f" {interaction.user.display_name} flips off {target.display_name} <:fuckyoumx:1538591235927965726>",
-        description="*Well, that's not very nice!*",
+        description="fuck you",
         color=discord.Color.red()
     )
     # Put your direct image URL here
@@ -49,7 +49,7 @@ async def flipoff(interaction: discord.Interaction, target: discord.User):
 async def kill(interaction: discord.Interaction, target: discord.User):
     embed = discord.Embed(
         title=f" {interaction.user.display_name} completely erased {target.display_name} 💀",
-        description="*DIE!!!*",
+        description="DIE BITCH",
         color=discord.Color.dark_red()
     )
     # Put image URL for Ultra M / Horror Mario killing
@@ -61,7 +61,7 @@ async def kill(interaction: discord.Interaction, target: discord.User):
 async def laugh(interaction: discord.Interaction, target: discord.User):
     embed = discord.Embed(
         title=f" {interaction.user.display_name} laughs at {target.display_name}! ",
-        description="*LMAO*",
+        description="LMAOAOOAOAO",
         color=discord.Color.gold()
     )
     # Put image URL here
