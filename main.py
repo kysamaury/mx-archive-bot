@@ -1,28 +1,21 @@
 import os
+import asyncio
 import threading
 from flask import Flask
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-# --- KEEP-ALIVE SERVER FOR 24/7 HOSTING ---
-app = Flask('')
+# --- KEEP-ALIVE FLASK SERVER ---
+app = Flask(__name__)
 
 @app.route('/')
 def home():
     return "Bot is alive and running!"
 
-def run_flask():
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
-
-def keep_alive():
-    t = threading.Thread(target=run_flask)
-    t.daemon = True
-    t.start()
-
 # --- DISCORD BOT SETUP ---
 intents = discord.Intents.default()
-intents.message_content = True  # Required to read chat messages for song names
+intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -35,7 +28,6 @@ async def help_command(interaction: discord.Interaction):
         color=discord.Color.red()
     )
     
-    # Section 1: Madness Reactions
     embed.add_field(
         name="• <:mx:1538614409902170212> - `/madness` commands",
         value=(
@@ -47,7 +39,6 @@ async def help_command(interaction: discord.Interaction):
         inline=False
     )
     
-    # Section 2: Automatic Song & Message Triggers
     embed.add_field(
         name="• <:music:1538614127659061359> - Automatic Triggers (Chat)",
         value=(
@@ -57,17 +48,15 @@ async def help_command(interaction: discord.Interaction):
         inline=False
     )
     
-    # Section 3: Admin Tools
     embed.add_field(
         name="• <:mushroome:1538614584435277996> - embeds",
-        value="• Embed Builder for anything u want lol. ",
+        value="• Embed Builder for anything u want lol.",
         inline=False
     )
     
     embed.set_footer(text="MX Archive - Mario's Madness Bot")
-    
     await interaction.response.send_message(embed=embed)
-    
+
 # --- MADNESS REACTION COMMANDS GROUP ---
 class MadnessGroup(app_commands.Group):
     def __init__(self):
@@ -75,43 +64,39 @@ class MadnessGroup(app_commands.Group):
 
 madness_group = MadnessGroup()
 
-# 1. Flip Off Command
 @madness_group.command(name="flipoff", description="flip off an annoying user")
 async def flipoff(interaction: discord.Interaction, target: discord.User):
     embed = discord.Embed(
-        title=f" {interaction.user.display_name} flips off {target.display_name} <:fuckyoumx:1538591235927965726>",
+        title=f"{interaction.user.display_name} flips off {target.display_name} <:fuckyoumx:1538591235927965726>",
         description="fuck you",
         color=discord.Color.red()
     )
     embed.set_image(url="https://i.pinimg.com/736x/d5/08/12/d5081271cdf82eb695611f101342db7b.jpg")
     await interaction.response.send_message(embed=embed)
 
-# 2. Kill / Defeat Command
 @madness_group.command(name="kill", description="kill a user")
 async def kill(interaction: discord.Interaction, target: discord.User):
     embed = discord.Embed(
-        title=f" {interaction.user.display_name} kills {target.display_name} 💀💀",
+        title=f"{interaction.user.display_name} kills {target.display_name} 💀💀",
         description="DIE BITCH",
         color=discord.Color.dark_red()
     )
     embed.set_image(url="https://i.pinimg.com/736x/bc/a7/35/bca735ecf4b651b7fabd80c5ea785ec4.jpg")
     await interaction.response.send_message(embed=embed)
 
-# 3. Laugh Command
 @madness_group.command(name="laugh", description="laugh ur ass off at a user")
 async def laugh(interaction: discord.Interaction, target: discord.User):
     embed = discord.Embed(
-        title=f" {interaction.user.display_name} laughs at {target.display_name}! ",
+        title=f"{interaction.user.display_name} laughs at {target.display_name}!",
         description="LMAOAOOAOAO",
         color=discord.Color.gold()
     )
     embed.set_image(url="https://i.pinimg.com/736x/5f/e6/8c/5fe68c736527cba5a324626ec0943394.jpg")
     await interaction.response.send_message(embed=embed)
 
-# Register the group with the bot
 bot.tree.add_command(madness_group)
 
-# --- SONG TRIGGERS (Longer phrases placed first) ---
+# --- SONG TRIGGERS ---
 SONG_TRIGGERS = {
     "its a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
     "it's a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
@@ -169,7 +154,6 @@ async def on_ready():
 
     print(f"Logged in as {bot.user.name}!")
 
-# --- CHAT LISTENER FOR SONG TRIGGERS AND CUSTOM RESPONSES ---
 @bot.event
 async def on_message(message: discord.Message):
     if message.author.bot:
@@ -223,11 +207,19 @@ class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
 async def embedbuilder(interaction: discord.Interaction):
     await interaction.response.send_modal(EmbedBuilderModal())
 
-# Start keep-alive server and run bot
-keep_alive()
+# --- ASYNC BOT RUNNER ---
+def start_bot():
+    token = os.getenv("DISCORD_TOKEN") or os.getenv("TOKEN")
+    if token:
+        asyncio.run(bot.start(token))
+    else:
+        print("ERROR: DISCORD_TOKEN environment variable is not set!")
 
-token = os.getenv("DISCORD_TOKEN") or os.getenv("TOKEN")
-if token:
-    bot.run(token)
-else:
-    print("ERROR: DISCORD_TOKEN is not set in Environment Variables!")
+# Run Discord bot on a background thread so Flask can immediately bind port 8080
+bot_thread = threading.Thread(target=start_bot, daemon=True)
+bot_thread.start()
+
+# Main thread runs Flask directly on port 8080 (or Render's PORT)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
