@@ -12,7 +12,6 @@ app = Flask('')
 def home():
     return "Bot is alive and running!"
 
-# Change this:
 def run_flask():
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
 
