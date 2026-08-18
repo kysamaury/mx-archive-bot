@@ -160,22 +160,16 @@ SONG_TRIGGERS = {
 
 @bot.event
 async def on_ready():
-    # Set status to Do Not Disturb and Activity to Listening to /help
-    activity = discord.Activity(
-        type=discord.ActivityType.listening, 
-        name="/help"
-    )
-    await bot.change_presence(
-        status=discord.Status.dnd, 
-        activity=activity
-    )
+    # Set status
+    activity = discord.Activity(type=discord.ActivityType.listening, name="/help")
+    await bot.change_presence(status=discord.Status.dnd, activity=activity)
     
-    # Sync slash commands
+    # Force sync slash commands
     try:
         synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} command(s)")
+        print(f"✅ Successfully synced {len(synced)} command(s) globally!")
     except Exception as e:
-        print(f"Failed to sync commands: {e}")
+        print(f"❌ Failed to sync commands: {e}")
         
     print(f"Logged in as {bot.user.name}!")
 
