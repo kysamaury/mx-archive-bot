@@ -17,6 +17,7 @@ def run_flask():
 
 def keep_alive():
     t = threading.Thread(target=run_flask)
+    t.daemon = True
     t.start()
 
 # --- DISCORD BOT SETUP ---
@@ -82,7 +83,6 @@ async def flipoff(interaction: discord.Interaction, target: discord.User):
         description="fuck you",
         color=discord.Color.red()
     )
-    # Put your direct image URL here
     embed.set_image(url="https://i.pinimg.com/736x/d5/08/12/d5081271cdf82eb695611f101342db7b.jpg")
     await interaction.response.send_message(embed=embed)
 
@@ -94,7 +94,6 @@ async def kill(interaction: discord.Interaction, target: discord.User):
         description="DIE BITCH",
         color=discord.Color.dark_red()
     )
-    # Put image URL for Ultra M / Horror Mario killing
     embed.set_image(url="https://i.pinimg.com/736x/bc/a7/35/bca735ecf4b651b7fabd80c5ea785ec4.jpg")
     await interaction.response.send_message(embed=embed)
 
@@ -106,7 +105,6 @@ async def laugh(interaction: discord.Interaction, target: discord.User):
         description="LMAOAOOAOAO",
         color=discord.Color.gold()
     )
-    # Put image URL here
     embed.set_image(url="https://i.pinimg.com/736x/5f/e6/8c/5fe68c736527cba5a324626ec0943394.jpg")
     await interaction.response.send_message(embed=embed)
 
@@ -160,11 +158,9 @@ SONG_TRIGGERS = {
 
 @bot.event
 async def on_ready():
-    # Set status
     activity = discord.Activity(type=discord.ActivityType.listening, name="/help")
     await bot.change_presence(status=discord.Status.dnd, activity=activity)
 
-    # Force sync slash commands
     try:
         synced = await bot.tree.sync()
         print(f"Synced {len(synced)} command(s) globally!")
@@ -172,7 +168,7 @@ async def on_ready():
         print(f"Failed to sync commands: {e}")
 
     print(f"Logged in as {bot.user.name}!")
-    
+
 # --- CHAT LISTENER FOR SONG TRIGGERS AND CUSTOM RESPONSES ---
 @bot.event
 async def on_message(message: discord.Message):
@@ -181,12 +177,10 @@ async def on_message(message: discord.Message):
 
     content_lower = message.content.lower()
 
-    # Special trigger for MX
     if "i hate mx" in content_lower:
         await message.channel.send("Fuck you <:fuckyoumx:1538591235927965726>")
         return
 
-    # Check for song gif triggers
     for song_title, gif_url in SONG_TRIGGERS.items():
         if song_title in content_lower:
             embed = discord.Embed(
@@ -231,5 +225,9 @@ async def embedbuilder(interaction: discord.Interaction):
 
 # Start keep-alive server and run bot
 keep_alive()
-token = os.getenv("DISCORD_TOKEN")
-bot.run(token)
+
+token = os.getenv("DISCORD_TOKEN") or os.getenv("TOKEN")
+if token:
+    bot.run(token)
+else:
+    print("ERROR: DISCORD_TOKEN is not set in Environment Variables!")
