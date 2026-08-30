@@ -161,9 +161,15 @@ async def on_message(message: discord.Message):
 
     content_lower = message.content.lower()
 
+    # --- HATE MX TRIGGER ---
     if "i hate mx" in content_lower:
-        await message.channel.send("Fuck you <:fuckyoumx:1538591235927965726>")
+        embed = discord.Embed(color=discord.Color.dark_red())
+        # fucking gif link FUCK my life.
+        embed.set_image(url="https://cdn.discordapp.com/attachments/1538562192952266783/1543638305621540954/DIE_1.gif?ex=6a9598b3&is=6a944733&hm=3b0f012e0a246fbcad439198a7de494dccb77d03b82a05f5e00f41b68b3ba493&")
+        await message.channel.send(embed=embed)
         return
+
+    # SONG TRIGGER MESSAGE
 
     for song_title, gif_url in SONG_TRIGGERS.items():
         if song_title in content_lower:
