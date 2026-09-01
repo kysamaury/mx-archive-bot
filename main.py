@@ -99,6 +99,7 @@ bot.tree.add_command(madness_group)
 # --- SONG TRIGGERS ---
 SONG_TRIGGERS = {
     "its a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
+    "it's-a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
     "it's a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
     "starman slaughter": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571763284451488/starman.gif?ex=6a832a1d&is=6a81d89d&hm=180c763376acb2b4d1dce7ebd9a26bdedae9fef7982f05759b6dc6a31c4549c9&",
     "all stars": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579080994099240/all-stars.gif?ex=6a8330ee&is=6a81df6e&hm=caa074d312050a922bdb876e70d2b75a3ed986e50f51d16260cf6f793aee69ee&",
@@ -110,10 +111,8 @@ SONG_TRIGGERS = {
     "nourish blood": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577039521620118/nourishing-blood.gif?ex=6a832f07&is=6a81dd87&hm=9f76e749a19c85018551f9b43acbb73735a8a39cd46c456ec313b045db094a94&",
     "alone": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577314303189134/alone.gif?ex=6a832f49&is=6a81ddc9&hm=71506e4aa5af028c17eacbb748f00757f4d1860e4d43331ea77ed7754d2276df&",
     "oh god no": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570662778507344/oh-god-no.gif?ex=6a832917&is=6a81d797&hm=4bed85b274b3bc9629b4eb3a847abd6293535e14917c1940ad2206aeddcefa25&",
-    "ogn": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570662778507344/oh-god-no.gif?ex=6a832917&is=6a81d797&hm=4bed85b274b3bc9629b4eb3a847abd6293535e14917c1940ad2206aeddcefa25&",
     "i hate you": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&",
     "i hate u": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&",
-    "ihy": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&",
     "thalassophobia": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571619893514330/thalassaphobia.gif?ex=6a8329fb&is=6a81d87b&hm=9109f505c83d27dc24daf9df7baf4d21f64dc3a20c7888ce79ce91ba42c7a9c0&",
     "apparition": "https://cdn.discordapp.com/attachments/1538562192952266783/1538576341899939920/apparition.gif?ex=6a832e61&is=6a81dce1&hm=05e99f2d2f8ae7eda7089ef62022dc70c0ff1b7f7334b8a270cd929cc6804366&",
     "last course": "https://cdn.discordapp.com/attachments/1538562192952266783/1538572792641880135/last-course.gif?ex=6a832b13&is=6a81d993&hm=27ee6e54e031c3d1ea3610a4ee2b1bd11f626f05cc5465e210f04ff95e6bf42d&",
@@ -138,7 +137,8 @@ SONG_TRIGGERS = {
     "abandoned": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575345710800906/abandoned.gif?ex=6a832d73&is=6a81dbf3&hm=ec12d889fff070d6ad079254142ae90d4453a00f717daa579ff44a6d72c475ef&",
     "the end": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575019989270619/the-end.gif?ex=6a832d26&is=6a81dba6&hm=9be2b19d4c43fe8d87ad7f65e90742073716c7d913a85a93766aab504d9a40ea&",
     "you cannot beat us": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579929111994498/you-cannot-beat-us.gif?ex=6a8331b8&is=6a81e038&hm=9dfeed19d695b8b8d5ac37b1ce2fa09cf1e5bf3b732d932aca25bb3067e84fd0&",
-    "unbeatable": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579693593436242/unbeatable.gif?ex=6a833180&is=6a81e000&hm=1f76bb83c1cdbcc0dde6c77a138f29e2628b62498d338530f7ae651f55a8379e&"
+    "unbeatable": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579693593436242/unbeatable.gif?ex=6a833180&is=6a81e000&hm=1f76bb83c1cdbcc0dde6c77a138f29e2628b62498d338530f7ae651f55a8379e&",
+    "iason mason": "https://cdn.discordapp.com/attachments/1538562192952266783/1544375439366033508/BAHHH.gif?ex=6a984735&is=6a96f5b5&hm=c96c084c718d6d05b8e8ffa3b8eae48fed5e14a1d9890395c2a135cea66dfeab&",
 }
 
 @bot.event
