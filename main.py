@@ -139,6 +139,7 @@ SONG_TRIGGERS = {
     "you cannot beat us": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579929111994498/you-cannot-beat-us.gif?ex=6a8331b8&is=6a81e038&hm=9dfeed19d695b8b8d5ac37b1ce2fa09cf1e5bf3b732d932aca25bb3067e84fd0&",
     "unbeatable": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579693593436242/unbeatable.gif?ex=6a833180&is=6a81e000&hm=1f76bb83c1cdbcc0dde6c77a138f29e2628b62498d338530f7ae651f55a8379e&",
     "iason mason": "https://cdn.discordapp.com/attachments/1538562192952266783/1544375439366033508/BAHHH.gif?ex=6a984735&is=6a96f5b5&hm=c96c084c718d6d05b8e8ffa3b8eae48fed5e14a1d9890395c2a135cea66dfeab&",
+    "secret exit": "https://cdn.discordapp.com/attachments/1538562192952266783/1544393783557226496/secret.gif?ex=6a98584b&is=6a9706cb&hm=47139c0c96642f3ad3415aea56689167b9a4585540be5fbb4e8cbea37232d1a0&"
 }
 
 @bot.event
