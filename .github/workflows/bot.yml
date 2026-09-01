@@ -6,7 +6,7 @@ on:
   schedule:
     - cron: '0 */5 * * *'
 
-# --- PREVENTS DUPLICATE INSTANCES ---
+# --- PREVENTS DUPLICATE INSTANCES 
 concurrency:
   group: mx-bot-instance
   cancel-in-progress: true
