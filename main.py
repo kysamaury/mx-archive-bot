@@ -109,7 +109,7 @@ SONG_TRIGGERS = {
     "mario sing and game rhythm 9": "https://cdn.discordapp.com/attachments/1538562192952266783/1538567838879457320/msagr.gif?ex=6a832675&is=6a81d4f5&hm=e83769ac2b6b4c0ad4f85c703fc8491185b528f9490226573b4735d46ea1fdba&",
     "nourishing blood": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577039521620118/nourishing-blood.gif?ex=6a832f07&is=6a81dd87&hm=9f76e749a19c85018551f9b43acbb73735a8a39cd46c456ec313b045db094a94&",
     "nourish blood": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577039521620118/nourishing-blood.gif?ex=6a832f07&is=6a81dd87&hm=9f76e749a19c85018551f9b43acbb73735a8a39cd46c456ec313b045db094a94&",
-    "alone": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577314303189134/alone.gif?ex=6a832f49&is=6a81ddc9&hm=71506e4aa5af028c17eacbb748f00757f4d1860e4d43331ea77ed7754d2276df&",
+    "alone": "https://cdn.discordapp.com/attachments/1538562192952266783/1544379073776717824/alone.gif?ex=6a984a98&is=6a96f918&hm=0bef7dcce04fdb526839e5233f42ec37bdbe7af38fe44b5bcf44344900243419&",
     "oh god no": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570662778507344/oh-god-no.gif?ex=6a832917&is=6a81d797&hm=4bed85b274b3bc9629b4eb3a847abd6293535e14917c1940ad2206aeddcefa25&",
     "i hate you": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&",
     "i hate u": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&",
