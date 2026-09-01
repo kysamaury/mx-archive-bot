@@ -2,13 +2,13 @@ name: 24/7 Discord Bot Runner
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ main, master ]
   schedule:
     - cron: '0 */5 * * *'
 
-# PREVENTS DUPLICATE BOT INSTANCES
+# --- PREVENTS DUPLICATE INSTANCES ---
 concurrency:
-  group: mx-archive-bot-runner
+  group: mx-bot-instance
   cancel-in-progress: true
 
 jobs:
