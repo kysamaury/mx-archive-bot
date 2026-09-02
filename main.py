@@ -16,9 +16,34 @@ def home():
 # --- DISCORD BOT SETUP ---
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# --- WELCOMING SYSTEM ---
+WELCOME_CHANNEL_ID = 1495794831136395275
+@bot.event
+async def on_member_join(member: discord.Member):
+    channel = member.guild.get_channel(WELCOME_CHANNEL_ID)
+    
+    if channel:
+        # Ordinal suffix helper for member count (1st, 2nd, 3rd, 251st, etc.)
+        count = member.guild.member_count
+        suffix = "th" if 11 <= count % 100 <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(count % 10, "th")
+        
+        embed = discord.Embed(
+            title="A NEW VICTIM HAS ENTERED...",
+            description=f"Welcome {member.mention} to **{member.guild.name}**!\n"
+                        f"You are the **{count}{suffix}** trapped member in Mario's cartridge. There is no escape.. WAHOOO!! <:mxsmile:1538591783645220965> ",
+            color=discord.Color.red()
+        )
+        
+        # Optional: Set an image/gif for the welcome embed
+        embed.set_image(url="https://images-ext-1.discordapp.net/external/X9exZh596qntc15b6gERDH-PnS_xYOO32ibmRyYHOF0/%3Fq%3Dtbn%3AANd9GcQhG75XaBENR78fYYNUPjKxVef6zfX3dXTaaOAndsFQ2g%26s%3D10/https/encrypted-tbn0.gstatic.com/images?format=webp")
+        embed.set_thumbnail(url=member.display_avatar.url)
+        
+        await channel.send(embed=embed)
+        
 # --- HELP COMMAND ---
 @bot.tree.command(name="help", description="Learn how to use MX Archive")
 async def help_command(interaction: discord.Interaction):
