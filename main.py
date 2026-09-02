@@ -21,7 +21,7 @@ intents.members = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # --- WELCOMING SYSTEM ---
-WELCOME_CHANNEL_ID = 1495794831136395275
+WELCOME_CHANNEL_ID = 1538562192952266783
 @bot.event
 async def on_member_join(member: discord.Member):
     channel = member.guild.get_channel(WELCOME_CHANNEL_ID)
