@@ -225,6 +225,80 @@ async def on_message(message: discord.Message):
 
     await bot.process_commands(message)
 
+# Character card pool with rarity weights
+CARDS = [
+    {
+        "name": "MX",
+        "rarity": "Legendary",
+        "color": 0xFF0000,
+        "image": "https://cdn.discordapp.com/attachments/1412181326215254151/1546205651263430777/Char23.png?ex=6a9eefba&is=6a9d9e3a&hm=5ba123be6b9490b0ab5bec045084b4baa9621fe9c208b23ca9f6eeea7874d4a5&",
+    },
+    {
+        "name": "Mr. Virtual",
+        "rarity": "Epic",
+        "color": 0x800080,
+        "image": "https://cdn.discordapp.com/attachments/1412181326215254151/1546205739817639956/Char41.png?ex=6a9eefcf&is=6a9d9e4f&hm=d2528363b6ae715b8c1b3cac1cc8d732b333d13abfd9f2ada03dc500f8c2cd04&",
+    },
+    {
+        "name": "Mr. L",
+        "rarity": "Rare",
+        "color": 0x00FF00,
+        "image": "https://cdn.discordapp.com/attachments/1412181326215254151/1546206090566570005/Char35.png?ex=6a9ef023&is=6a9d9ea3&hm=6d899c3395de511d3986c669d5034ea4da4f2da255722d40e109969521c6cba3&",
+    },
+    {
+        "name": "Ultra M",
+        "rarity": "Common",
+        "color": 0x888888,
+        "image": "https://cdn.discordapp.com/attachments/1412181326215254151/1546205855458787468/Char38.png?ex=6a9eefeb&is=6a9d9e6b&hm=f3bb23b849d156d971074e43a2c6f054f62100334e14b111547637a2a8875713&",
+    },
+]
+
+
+class ClaimView(discord.ui.View):
+
+  def __init__(self, card):
+    super().__init__(timeout=30)
+    self.card = card
+    self.claimed = False
+
+  @discord.ui.button(
+      label="CLAIM CARD!", style=discord.ButtonStyle.danger, emoji="🎴"
+  )
+  async def claim_button(
+      self, interaction: discord.Interaction, button: discord.ui.Button
+  ):
+    if self.claimed:
+      await interaction.response.send_message(
+        "Someone already took this soul!", ephemeral=True
+      )
+      return
+
+    self.claimed = True
+    button.disabled = True
+    button.label = f"Claimed by {interaction.user.display_name}!"
+    await interaction.response.edit_message(view=self)
+    await interaction.followup.send(
+        f"🎉 {interaction.user.mention} claimed **{self.card['name']}"
+        f" ({self.card['rarity']})!"
+    )
+
+
+@bot.command()
+async def drop(ctx):
+  # Pick a random card from the pool
+  card = random.choice(CARDS)
+
+  embed = discord.Embed(
+      title=f" WILD CARD SPOTTED: {card['name']}",
+      description=f"Rarity: **\nClick below quickly to claim!",
+      color=card["color"],
+  )
+  embed.set_image(url=card["image"])
+
+  view = ClaimView(card)
+  await ctx.send(embed=embed, view=view)
+
+
 # --- EMBED BUILDER COMMAND ---
 class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
     embed_title = discord.ui.TextInput(label="Title", placeholder="Enter embed title...", required=True)
