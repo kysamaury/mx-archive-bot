@@ -18,7 +18,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-bot = commands.Bot(command_prefix="m!", intents=intents)
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 # --- WELCOMING SYSTEM ---
 WELCOME_CHANNEL_ID = 1495794831136395275
