@@ -226,10 +226,14 @@ async def on_message(message: discord.Message):
     await bot.process_commands(message)
 
 # Character card pool with rarity weights
+import random
+import discord
+from discord.ext import commands
+
 CARDS = [
     {
         "name": "MX",
-        "rarity": "Legendary",
+        "rarity": "Epic",
         "color": 0xFF0000,
         "image": "https://cdn.discordapp.com/attachments/1412181326215254151/1546205651263430777/Char23.png?ex=6a9eefba&is=6a9d9e3a&hm=5ba123be6b9490b0ab5bec045084b4baa9621fe9c208b23ca9f6eeea7874d4a5&",
     },
@@ -247,7 +251,7 @@ CARDS = [
     },
     {
         "name": "Ultra M",
-        "rarity": "Common",
+        "rarity": "Legendary",
         "color": 0x888888,
         "image": "https://cdn.discordapp.com/attachments/1412181326215254151/1546205855458787468/Char38.png?ex=6a9eefeb&is=6a9d9e6b&hm=f3bb23b849d156d971074e43a2c6f054f62100334e14b111547637a2a8875713&",
     },
@@ -269,7 +273,7 @@ class ClaimView(discord.ui.View):
   ):
     if self.claimed:
       await interaction.response.send_message(
-        "Someone already took this soul!", ephemeral=True
+          "Someone already took this soul!", ephemeral=True
       )
       return
 
@@ -289,15 +293,13 @@ async def drop(ctx):
 
   embed = discord.Embed(
       title=f"🎴 WILD CARD SPOTTED: {card['name']}",
-      description=f"Rarity: **{card['rarity']}**\nClick below quickly to claim!",
+      description=f"Rarity: **\nClick below quickly to claim!",
       color=card["color"],
   )
-  # Standard PNG/JPG links work here perfectly
   embed.set_image(url=card["image"])
 
   view = ClaimView(card)
   await ctx.send(embed=embed, view=view)
-
 
 # --- EMBED BUILDER COMMAND ---
 class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
