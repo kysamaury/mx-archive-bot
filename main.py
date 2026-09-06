@@ -1,10 +1,10 @@
+import io
 import os
-import asyncio
-import threading
-from flask import Flask
+import random
 import discord
-from discord import app_commands
 from discord.ext import commands
+from PIL import Image
+import requests
 
 # --- KEEP-ALIVE FLASK SERVER ---
 app = Flask(__name__)
@@ -225,81 +225,189 @@ async def on_message(message: discord.Message):
 
     await bot.process_commands(message)
 
-# Character card pool with rarity weights
-import random
-import discord
-from discord.ext import commands
-
+# --- CARD DATABASE ---
 CARDS = [
     {
         "name": "MX",
-        "rarity": "Epic",
+        "rarity": "Legendary",
         "color": 0xFF0000,
-        "image": "https://cdn.discordapp.com/attachments/1412181326215254151/1546205651263430777/Char23.png?ex=6a9eefba&is=6a9d9e3a&hm=5ba123be6b9490b0ab5bec045084b4baa9621fe9c208b23ca9f6eeea7874d4a5&",
+        "image": "https://i.imgur.com/8QpX1Zy.png",  # Replace with direct image link
     },
     {
         "name": "Mr. Virtual",
         "rarity": "Epic",
         "color": 0x800080,
-        "image": "https://cdn.discordapp.com/attachments/1412181326215254151/1546205739817639956/Char41.png?ex=6a9eefcf&is=6a9d9e4f&hm=d2528363b6ae715b8c1b3cac1cc8d732b333d13abfd9f2ada03dc500f8c2cd04&",
+        "image": "https://i.imgur.com/8QpX1Zy.png",  # Replace with direct image link
     },
     {
         "name": "Mr. L",
         "rarity": "Rare",
         "color": 0x00FF00,
-        "image": "https://cdn.discordapp.com/attachments/1412181326215254151/1546206090566570005/Char35.png?ex=6a9ef023&is=6a9d9ea3&hm=6d899c3395de511d3986c669d5034ea4da4f2da255722d40e109969521c6cba3&",
+        "image": "https://i.imgur.com/8QpX1Zy.png",  # Replace with direct image link
     },
     {
         "name": "Ultra M",
-        "rarity": "Legendary",
+        "rarity": "Common",
         "color": 0x888888,
-        "image": "https://cdn.discordapp.com/attachments/1412181326215254151/1546205855458787468/Char38.png?ex=6a9eefeb&is=6a9d9e6b&hm=f3bb23b849d156d971074e43a2c6f054f62100334e14b111547637a2a8875713&",
+        "image": "https://i.imgur.com/8QpX1Zy.png",  # Replace with direct image link
     },
 ]
 
+# --- SONG/GIF TRIGGERS ---
+SONG_TRIGGERS = {
+    "i hate mx": "https://i.imgur.com/8QpX1Zy.png",  # Replace with your GIF URL
+}
 
-class ClaimView(discord.ui.View):
 
-  def __init__(self, card):
-    super().__init__(timeout=30)
-    self.card = card
-    self.claimed = False
+# --- GACHA BUTTON VIEW ---
+class MultiClaimView(discord.ui.View):
 
-  @discord.ui.button(
-      label="CLAIM CARD!", style=discord.ButtonStyle.danger, emoji="🎴"
-  )
-  async def claim_button(
+  def __init__(self, cards):
+    super().__init__(timeout=60)
+    self.cards = cards
+    self.claimed = [False, False]
+
+  @discord.ui.button(label="1", style=discord.ButtonStyle.primary)
+  async def claim_card_1(
       self, interaction: discord.Interaction, button: discord.ui.Button
   ):
-    if self.claimed:
+    await self.handle_claim(interaction, button, 0)
+
+  @discord.ui.button(label="2", style=discord.ButtonStyle.primary)
+  async def claim_card_2(
+      self, interaction: discord.Interaction, button: discord.ui.Button
+  ):
+    await self.handle_claim(interaction, button, 1)
+
+  async def handle_claim(
+      self, interaction: discord.Interaction, button: discord.ui.Button, index: int
+  ):
+    if self.claimed[index]:
       await interaction.response.send_message(
-          "Someone already took this soul!", ephemeral=True
+          "That card was already claimed!", ephemeral=True
       )
       return
 
-    self.claimed = True
+    self.claimed[index] = True
     button.disabled = True
-    button.label = f"Claimed by {interaction.user.display_name}!"
+    button.label = f"#{index+1} Claimed!"
     await interaction.response.edit_message(view=self)
     await interaction.followup.send(
-        f"🎉 {interaction.user.mention} claimed **{self.card['name']}"
-        f" ({self.card['rarity']})!"
+        f"🎉 {interaction.user.mention} claimed **{self.cards[index]['name']}**"
+        f" ({self.cards[index]['rarity']})!"
     )
 
 
+# --- IMAGE STITCHING HELPER ---
+def create_side_by_side_image(img_url1, img_url2):
+  req1 = requests.get(img_url1, headers={"User-Agent": "Mozilla/5.0"})
+  req2 = requests.get(img_url2, headers={"User-Agent": "Mozilla/5.0"})
+
+  img1 = Image.open(io.BytesIO(req1.content)).convert("RGBA")
+  img2 = Image.open(io.BytesIO(req2.content)).convert("RGBA")
+
+  height = 300
+  img1 = img1.resize((int(img1.width * (height / img1.height)), height))
+  img2 = img2.resize((int(img2.width * (height / img2.height)), height))
+
+  total_width = img1.width + img2.width + 20
+  combined = Image.new("RGBA", (total_width, height), (0, 0, 0, 0))
+
+  combined.paste(img1, (0, 0))
+  combined.paste(img2, (img1.width + 20, 0))
+
+  buffer = io.BytesIO()
+  combined.save(buffer, format="PNG")
+  buffer.seek(0)
+  return discord.File(buffer, filename="drop.png")
+
+
+# --- EVENTS ---
+@bot.event
+async def on_ready():
+  print(f"Logged in as {bot.user.name}")
+
+
+@bot.event
+async def on_member_join(member):
+  channel = discord.utils.get(
+      member.guild.text_channels, name=WELCOME_CHANNEL_NAME
+  )
+  if channel:
+    count = member.guild.member_count
+    suffix = (
+        "th"
+        if 11 <= count % 100 <= 13
+        else {1: "st", 2: "nd", 3: "rd"}.get(count % 10, "th")
+    )
+    embed = discord.Embed(
+        title="⚠️ A NEW VICTIM HAS ENTERED",
+        description=(
+            f"Welcome {member.mention} to **{member.guild.name}**!\nAnother"
+            f" soul trapped in the cartridge... Member **#{count}{suffix}**."
+        ),
+        color=discord.Color.red(),
+    )
+    embed.set_thumbnail(url=member.display_avatar.url)
+    await channel.send(embed=embed)
+
+
+@bot.event
+async def on_member_remove(member):
+  channel = discord.utils.get(
+      member.guild.text_channels, name=WELCOME_CHANNEL_NAME
+  )
+  if channel:
+    embed = discord.Embed(
+        title="💀 GAME OVER",
+        description=(
+            f"**{member.name}** couldn't survive the cartridge and left."
+        ),
+        color=discord.Color.dark_gray(),
+    )
+    await channel.send(embed=embed)
+
+
+@bot.event
+async def on_message(message):
+  if message.author.bot:
+    return
+
+  content_lower = message.content.lower()
+
+  for trigger, gif_url in SONG_TRIGGERS.items():
+    if trigger in content_lower:
+      embed = discord.Embed(color=discord.Color.dark_red())
+      embed.set_image(url=gif_url)
+      await message.channel.send(embed=embed)
+      return
+
+  await bot.process_commands(message)
+
+
+# --- COMMANDS ---
 @bot.command(name="drop")
 async def drop(ctx):
-  card = random.choice(CARDS)
+  card1, card2 = random.sample(CARDS, 2)
+  file = create_side_by_side_image(card1["image"], card2["image"])
 
   embed = discord.Embed(
-      title=f"🎴 WILD CARD SPOTTED: {card['name']}",
-      description=f"Rarity: **\nClick below quickly to claim!",
-      color=card["color"],
+      title="🎴 WILD DOUBLE DROP!",
+      description=(
+          f"**1.** {card1['name']} ({card1['rarity']})\n**2.**"
+          f" {card2['name']} ({card2['rarity']})"
+      ),
+      color=0xFF0000,
   )
-  embed.set_image(url=card["image"])
+  embed.set_image(url="attachment://drop.png")
 
-  view = ClaimView(card)
-  await ctx.send(embed=embed, view=view)
+  view = MultiClaimView([card1, card2])
+  await ctx.send(
+      content=f"🎮 {ctx.author.mention} is dropping 2 cards!",
+      file=file,
+      embed=embed,
+      view=view,
+  )
 
 # --- EMBED BUILDER COMMAND ---
 class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
