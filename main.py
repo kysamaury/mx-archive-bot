@@ -18,7 +18,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix="m!", intents=intents)
 
 # --- WELCOMING SYSTEM ---
 WELCOME_CHANNEL_ID = 1495794831136395275
@@ -283,16 +283,16 @@ class ClaimView(discord.ui.View):
     )
 
 
-@bot.command()
+@bot.command(name="drop")
 async def drop(ctx):
-  # Pick a random card from the pool
   card = random.choice(CARDS)
 
   embed = discord.Embed(
-      title=f" WILD CARD SPOTTED: {card['name']}",
-      description=f"Rarity: **\nClick below quickly to claim!",
+      title=f"🎴 WILD CARD SPOTTED: {card['name']}",
+      description=f"Rarity: **{card['rarity']}**\nClick below quickly to claim!",
       color=card["color"],
   )
+  # Standard PNG/JPG links work here perfectly
   embed.set_image(url=card["image"])
 
   view = ClaimView(card)
