@@ -142,8 +142,8 @@ SONG_TRIGGERS = {
     "apparition": "https://cdn.discordapp.com/attachments/1538562192952266783/1538576341899939920/apparition.gif?ex=6a832e61&is=6a81dce1&hm=05e99f2d2f8ae7eda7089ef62022dc70c0ff1b7f7334b8a270cd929cc6804366&",
     "last course": "https://cdn.discordapp.com/attachments/1538562192952266783/1538572792641880135/last-course.gif?ex=6a832b13&is=6a81d993&hm=27ee6e54e031c3d1ea3610a4ee2b1bd11f626f05cc5465e210f04ff95e6bf42d&",
     "dark forest": "https://cdn.discordapp.com/attachments/1538562192952266783/1538576092569538600/dark-forest.gif?ex=6a832e25&is=6a81dca5&hm=666306bfb51d53319370bd5716b0833aba545218aa41d8e1be12261b32bc696d&",
-    "bad day": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577767203999774/bad-day.gif?ex=6a832fb5&is=6a81de35&hm=13f360346131158fd12b4c9311e30372c323340d03a098f3c01778415cebaf7c&",
-    "day out": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577980752789645/day-out.gif?ex=6a832fe8&is=6a81de68&hm=fde2cd1ddc80281045abbaa9249fe56c6875cfc1337baadbeb2ec73fecde5831&",
+    "bad day": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197975456420001/bad-day.gif?ex=6a9ee894&is=6a9d9714&hm=68703ccaca663eaf6c976102f52ad2f2062245767b0e3e9ca848fd0dff1ba677&",
+    "day out": "https://cdn.discordapp.com/attachments/1412181326215254151/1546198976087195689/day-out.gif?ex=6a9ee982&is=6a9d9802&hm=7db81769c1566d7d56e71b9277dde2f9963a7b308d3a48099908ba9e05727966&",
     "dictators": "https://cdn.discordapp.com/attachments/1538562192952266783/1544817194708500480/dictator.gif?ex=6a99e2a0&is=6a989120&hm=0afa3830f6b29ccf23fd0c3c8308884a77382d2bc38fcce476063433f49939e0&",
     "dictator": "https://cdn.discordapp.com/attachments/1538562192952266783/1544817194708500480/dictator.gif?ex=6a99e2a0&is=6a989120&hm=0afa3830f6b29ccf23fd0c3c8308884a77382d2bc38fcce476063433f49939e0&",
     "race traitors": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573362819768383/race-traitors.gif?ex=6a832b9b&is=6a81da1b&hm=37a88957ca526100f173f67c9d19718c889f55ad61b717e4423d706a478bebed&",
@@ -151,7 +151,7 @@ SONG_TRIGGERS = {
     "no hope": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573901091700869/no-hope.gif?ex=6a832c1b&is=6a81da9b&hm=c81009902dea388ab0330b18e981734d7b120ed508c7eca0d7b958420e12f526&",
     "no party": "https://cdn.discordapp.com/attachments/1538562192952266783/1538574841542610984/no-party.gif?ex=6a832cfb&is=6a81db7b&hm=c44ec259b55379839473a86497f484311eb71469c4d6256b97a40086ead3ac05&",
     "piracy": "https://cdn.discordapp.com/attachments/1538562192952266783/1538574841542610984/no-party.gif?ex=6a832cfb&is=6a81db7b&hm=c44ec259b55379839473a86497f484311eb71469c4d6256b97a40086ead3ac05&",
-    "golden land": "https://cdn.discordapp.com/attachments/1538562192952266783/1538578988723863602/golden-land.gif?ex=6a8330d8&is=6a81df58&hm=07b99c671bd02407ccff2ed55bec845813dd0aa823dd64421efd3c85b0f4e6fe&",
+    "golden land": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197989213606078/golden-land.gif?ex=6a9ee897&is=6a9d9717&hm=3dc6be303c1b5256f8af1c6387e533fc92f15fcdb13910120225566b13786278&",
     "paranoid": "https://cdn.discordapp.com/attachments/1538562192952266783/1538572322762657832/paranoia.gif?ex=6a832aa3&is=6a81d923&hm=b378de278400c4c4c519eedea61b343e39c4ae953703fbd5999a0caa4d3bb61e&",
     "paranoia": "https://cdn.discordapp.com/attachments/1538562192952266783/1538572322762657832/paranoia.gif?ex=6a832aa3&is=6a81d923&hm=b378de278400c4c4c519eedea61b343e39c4ae953703fbd5999a0caa4d3bb61e&",
     "too late": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575627756765186/overdue.gif?ex=6a832db7&is=6a81dc37&hm=77d9c40349d6cc7c2634a4c83bbc98d36a5c8242a396d66b2a6661bb4e95d295&",
@@ -161,10 +161,11 @@ SONG_TRIGGERS = {
     "promotion": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573354964094976/promotion.gif?ex=6a832b99&is=6a81da19&hm=e148160af159b597f97768dc8d0eb4079f9a3979228d530cde3c0cbc280c5f40&",
     "abandoned": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575345710800906/abandoned.gif?ex=6a832d73&is=6a81dbf3&hm=ec12d889fff070d6ad079254142ae90d4453a00f717daa579ff44a6d72c475ef&",
     "the end": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575019989270619/the-end.gif?ex=6a832d26&is=6a81dba6&hm=9be2b19d4c43fe8d87ad7f65e90742073716c7d913a85a93766aab504d9a40ea&",
-    "you cannot beat us": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579929111994498/you-cannot-beat-us.gif?ex=6a8331b8&is=6a81e038&hm=9dfeed19d695b8b8d5ac37b1ce2fa09cf1e5bf3b732d932aca25bb3067e84fd0&",
-    "unbeatable": "https://cdn.discordapp.com/attachments/1538562192952266783/1538579693593436242/unbeatable.gif?ex=6a833180&is=6a81e000&hm=1f76bb83c1cdbcc0dde6c77a138f29e2628b62498d338530f7ae651f55a8379e&",
+    "you cannot beat us": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197939657900082/you-cannot-beat-us.gif?ex=6a9ee88b&is=6a9d970b&hm=8ee848caf13841f6c78fbb4b346edf19d1ecc7a69ff23f9e8ef14422e0649707&",
+    "unbeatable": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197911535222927/unbeatable.gif?ex=6a9ee885&is=6a9d9705&hm=beefc1a3d9426a06e273ee11eb65874155441b318dd6dccffbb90d0f4bc2ee8b&",
     "iason mason": "https://cdn.discordapp.com/attachments/1538562192952266783/1544375439366033508/BAHHH.gif?ex=6a984735&is=6a96f5b5&hm=c96c084c718d6d05b8e8ffa3b8eae48fed5e14a1d9890395c2a135cea66dfeab&",
-    "secret exit": "https://cdn.discordapp.com/attachments/1538562192952266783/1544393783557226496/secret.gif?ex=6a98584b&is=6a9706cb&hm=47139c0c96642f3ad3415aea56689167b9a4585540be5fbb4e8cbea37232d1a0&"
+    "secret exit": "https://cdn.discordapp.com/attachments/1538562192952266783/1544393783557226496/secret.gif?ex=6a98584b&is=6a9706cb&hm=47139c0c96642f3ad3415aea56689167b9a4585540be5fbb4e8cbea37232d1a0&",
+    "wahoo hoo hoo": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197885438398615/wahoo-hoo-hoo.gif?ex=6a9ee87e&is=6a9d96fe&hm=cebb0228ce372bfd31d12692eaa068f83b1ff832e4f76a33f912a080194bea3e&"
 }
 
 @bot.event
