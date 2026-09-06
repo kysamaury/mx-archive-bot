@@ -1,10 +1,10 @@
-import io
 import os
-import random
+import asyncio
+import threading
+from flask import Flask
 import discord
+from discord import app_commands
 from discord.ext import commands
-from PIL import Image
-import requests
 
 # --- KEEP-ALIVE FLASK SERVER ---
 app = Flask(__name__)
