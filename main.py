@@ -6,28 +6,28 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-# --- KEEP-ALIVE FLASK SERVER ---
+# keep alive
 app = Flask(__name__)
 
 @app.route('/')
 def home():
     return "Bot is alive and running!"
 
-# --- DISCORD BOT SETUP ---
+# bot setup
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# --- WELCOMING SYSTEM ---
+# welcome system
 WELCOME_CHANNEL_ID = 1495794831136395275
 @bot.event
 async def on_member_join(member: discord.Member):
     channel = member.guild.get_channel(WELCOME_CHANNEL_ID)
     
     if channel:
-        # Ordinal suffix helper for member count (1st, 2nd, 3rd, 251st, etc.)
+        # suffix helper for member count
         count = member.guild.member_count
         suffix = "th" if 11 <= count % 100 <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(count % 10, "th")
         
@@ -38,13 +38,13 @@ async def on_member_join(member: discord.Member):
             color=discord.Color.red()
         )
         
-        # Optional: Set an image/gif for the welcome embed
+        # image n embed 
         embed.set_image(url="https://images-ext-1.discordapp.net/external/X9exZh596qntc15b6gERDH-PnS_xYOO32ibmRyYHOF0/%3Fq%3Dtbn%3AANd9GcQhG75XaBENR78fYYNUPjKxVef6zfX3dXTaaOAndsFQ2g%26s%3D10/https/encrypted-tbn0.gstatic.com/images?format=webp")
         embed.set_thumbnail(url=member.display_avatar.url)
         
         await channel.send(embed=embed)
         
-# --- HELP COMMAND ---
+# /help command
 @bot.tree.command(name="help", description="Learn how to use MX Archive")
 async def help_command(interaction: discord.Interaction):
     embed = discord.Embed(
@@ -82,7 +82,7 @@ async def help_command(interaction: discord.Interaction):
     embed.set_footer(text="MX Archive - Mario's Madness Bot")
     await interaction.response.send_message(embed=embed)
 
-# --- MADNESS REACTION COMMANDS GROUP ---
+# madness reaction stuff 
 class MadnessGroup(app_commands.Group):
     def __init__(self):
         super().__init__(name="madness", description="Mario's Madness interaction reactions")
@@ -121,7 +121,8 @@ async def laugh(interaction: discord.Interaction, target: discord.User):
 
 bot.tree.add_command(madness_group)
 
-# --- SONG TRIGGERS ---
+#song trigger thing
+
 SONG_TRIGGERS = {
     "its a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
     "it's-a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
@@ -188,7 +189,7 @@ async def on_message(message: discord.Message):
 
     content_lower = message.content.lower()
 
-    # --- HATE MX TRIGGER ---
+    # hate mx trigger
     if "i hate mx" in content_lower:
         embed = discord.Embed(color=discord.Color.dark_red())
         # fucking gif link FUCK my life.
@@ -196,36 +197,36 @@ async def on_message(message: discord.Message):
         await message.channel.send(embed=embed)
         return
 
-    # --- HATE MX TRIGGER 2 ---
+    # hate mx trigger the second one.
     if "fuck mx" in content_lower:
         embed = discord.Embed(color=discord.Color.dark_red())
-        # fucking gif link FUCK my life.
+        # gif
         embed.set_image(url="https://cdn.discordapp.com/attachments/1538562192952266783/1543638305621540954/DIE_1.gif?ex=6a9598b3&is=6a944733&hm=3b0f012e0a246fbcad439198a7de494dccb77d03b82a05f5e00f41b68b3ba493&")
         await message.channel.send(embed=embed)
         return
 
- # --- HATE MX TRIGGER 2 ---
+ # love mx trigger
     if "i love mx" in content_lower:
         embed = discord.Embed(color=discord.Color.dark_red())
-        # fucking gif link FUCK my life.
+        # gif 
         embed.set_image(url="https://cdn.discordapp.com/attachments/1538562192952266783/1543646444492292166/Video_Project_10.gif?ex=6a95a047&is=6a944ec7&hm=ee56ee878fb23e09eacc59175b7171fa040e779e25b45eec8fc789772f1c2365&")
         await message.channel.send(embed=embed)
         return
 
-    # --- KYS TRIGGER  ---
+    # kys trigger
     if "kill yourself" in content_lower:
         embed = discord.Embed(color=discord.Color.dark_red())
-        # fucking gif link FUCK my life.
+        # i miss mario... KILL YOURSE- anyway, gif.
         embed.set_image(url="https://cdn.discordapp.com/attachments/1412181326215254151/1547692415794806794/kys.gif?ex=6aa45862&is=6aa306e2&hm=3b4b977b505aa53f7abec3ac7c94e1280da4e819be4fe08f29f1a84a08e4b269&")
         await message.channel.send(embed=embed)
         return
 
-    # SONG TRIGGER MESSAGE
+    # song trigger message
 
     for song_title, gif_url in SONG_TRIGGERS.items():
         if song_title in content_lower:
             embed = discord.Embed(
-                title=f"👀 Did someone say {song_title.title()}?",
+                title=f"👀 Did someone say {song_title.title()}???",
                 color=discord.Color.red()
             )
             embed.set_image(url=gif_url)
@@ -235,7 +236,7 @@ async def on_message(message: discord.Message):
     await bot.process_commands(message)
 
 
-# --- EMBED BUILDER COMMAND ---
+# embed builder command
 class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
     embed_title = discord.ui.TextInput(label="Title", placeholder="Enter embed title...", required=True)
     description = discord.ui.TextInput(label="Description", style=discord.TextStyle.paragraph, placeholder="Enter main text/description here...", required=True)
@@ -265,7 +266,7 @@ class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
 async def embedbuilder(interaction: discord.Interaction):
     await interaction.response.send_modal(EmbedBuilderModal())
 
-# --- ASYNC BOT RUNNER ---
+# async bot runner
 def start_bot():
     token = os.getenv("DISCORD_TOKEN") or os.getenv("TOKEN")
     if token:
@@ -273,11 +274,11 @@ def start_bot():
     else:
         print("ERROR: DISCORD_TOKEN environment variable is not set!")
 
-# Run Discord bot on a background thread so Flask can immediately bind port 8080
+# pew pew pew
 bot_thread = threading.Thread(target=start_bot, daemon=True)
 bot_thread.start()
 
-# Main thread runs Flask directly on port 8080 (or Render's PORT)
+# for render
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
