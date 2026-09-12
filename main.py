@@ -166,12 +166,15 @@ SONG_TRIGGERS = {
     "unbeatable": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197911535222927/unbeatable.gif?ex=6a9ee885&is=6a9d9705&hm=beefc1a3d9426a06e273ee11eb65874155441b318dd6dccffbb90d0f4bc2ee8b&",
     "iason mason": "https://cdn.discordapp.com/attachments/1538562192952266783/1544375439366033508/BAHHH.gif?ex=6a984735&is=6a96f5b5&hm=c96c084c718d6d05b8e8ffa3b8eae48fed5e14a1d9890395c2a135cea66dfeab&",
     "secret exit": "https://cdn.discordapp.com/attachments/1538562192952266783/1544393783557226496/secret.gif?ex=6a98584b&is=6a9706cb&hm=47139c0c96642f3ad3415aea56689167b9a4585540be5fbb4e8cbea37232d1a0&",
-    "wahoo hoo hoo": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197885438398615/wahoo-hoo-hoo.gif?ex=6a9ee87e&is=6a9d96fe&hm=cebb0228ce372bfd31d12692eaa068f83b1ff832e4f76a33f912a080194bea3e&"
+    "wahoo hoo hoo": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197885438398615/wahoo-hoo-hoo.gif?ex=6a9ee87e&is=6a9d96fe&hm=cebb0228ce372bfd31d12692eaa068f83b1ff832e4f76a33f912a080194bea3e&",
+    "burger": "https://cdn.discordapp.com/attachments/1412181326215254151/1548342384369205279/burger.gif?ex=6aa6b5b7&is=6aa56437&hm=d1ece91e9e42afa334985703159a3a2ff855e1b8b3d21607a97f2ab7714c0372&"
 }
+
+# status shit
 
 @bot.event
 async def on_ready():
-    activity = discord.Activity(type=discord.ActivityType.listening, name="/help")
+    activity = discord.Activity(type=discord.ActivityType.listening, name="POWERDOWN")
     await bot.change_presence(status=discord.Status.dnd, activity=activity)
 
     try:
