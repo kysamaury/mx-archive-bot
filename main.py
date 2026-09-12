@@ -1,53 +1,123 @@
-import os
 import asyncio
+import json
+import os
+import random
 import threading
+import time
 from flask import Flask
+
 import discord
 from discord import app_commands
 from discord.ext import commands
 
-# keep alive
+# --- KEEP ALIVE ---
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return "Bot is alive and running!"
 
-# bot setup
+@app.route("/")
+def home():
+  return "Bot is alive and running!"
+
+
+# --- BOT SETUP ---
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# welcome system
+# --- CHANNELS ---
 WELCOME_CHANNEL_ID = 1495794831136395275
+GOODBYE_CHANNEL_ID = 1523305137685135501
+LEVEL_CHANNEL_ID = 1548356296384712744
+
+# --- LEVELING SYSTEM CONFIGURATION ---
+DATA_FILE = "levels.json"
+xp_cooldowns = {}  # Tracks user cooldowns for XP gains
+
+# Define level role rewards: Level -> Role Name
+# (Make sure these roles exist in your Discord Server!)
+LEVEL_ROLES = {
+    1: "Level 1 - LOSER",
+    5: "Level 5 - Goomba",
+    10: "Level 10 - Koopa Troopa",
+    15: "Level 15 - Shy Guy",
+    20: "Level 20 - Boo",
+    30: "Level 30 - Piranha Plant",
+    40: "Level 40 - Lord of Madness",
+    45: "Level 45 - Hammer Bro",
+}
+
+
+def load_data():
+  if os.path.exists(DATA_FILE):
+    try:
+      with open(DATA_FILE, "r") as f:
+        return json.load(f)
+    except json.JSONDecodeError:
+      return {}
+  return {}
+
+
+def save_data(data):
+  with open(DATA_FILE, "w") as f:
+    json.dump(data, f, indent=4)
+
+
+def get_xp_for_level(level):
+  # XP required to reach the next level
+  return 5 * (level**2) + (50 * level) + 100
+
+
+def add_xp_to_user(user_id_str, xp_to_add):
+  data = load_data()
+  if user_id_str not in data:
+    data[user_id_str] = {"xp": 0, "level": 1}
+
+  data[user_id_str]["xp"] += xp_to_add
+  current_xp = data[user_id_str]["xp"]
+  current_level = data[user_id_str]["level"]
+
+  leveled_up = False
+  while current_xp >= get_xp_for_level(current_level):
+    current_level += 1
+    leveled_up = True
+
+  data[user_id_str]["level"] = current_level
+  save_data(data)
+  return leveled_up, current_level, data[user_id_str]["xp"]
+
+
+# --- WELCOME SYSTEM ---
 @bot.event
 async def on_member_join(member: discord.Member):
-    channel = member.guild.get_channel(WELCOME_CHANNEL_ID)
-    
-    if channel:
-        # suffix helper for member count
-        count = member.guild.member_count
-        suffix = "th" if 11 <= count % 100 <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(count % 10, "th")
-        
-        embed = discord.Embed(
-            title="A NEW VICTIM HAS ENTERED...",
-            description=f"Welcome {member.mention} to **{member.guild.name}**!\n"
-                        f"You are the **{count}{suffix}** trapped member in Mario's cartridge. There is no escape.. WAHOOO!! <:mxsmile:1538591783645220965> ",
-            color=discord.Color.red()
-        )
-        
-        # image n embed 
-        embed.set_image(url="https://images-ext-1.discordapp.net/external/X9exZh596qntc15b6gERDH-PnS_xYOO32ibmRyYHOF0/%3Fq%3Dtbn%3AANd9GcQhG75XaBENR78fYYNUPjKxVef6zfX3dXTaaOAndsFQ2g%26s%3D10/https/encrypted-tbn0.gstatic.com/images?format=webp")
-        embed.set_thumbnail(url=member.display_avatar.url)
-        
-        await channel.send(embed=embed)
+  channel = member.guild.get_channel(WELCOME_CHANNEL_ID)
+  if channel:
+    count = member.guild.member_count
+    suffix = (
+        "th"
+        if 11 <= count % 100 <= 13
+        else {1: "st", 2: "nd", 3: "rd"}.get(count % 10, "th")
+    )
 
-#goodbye system
+    embed = discord.Embed(
+        title="A NEW VICTIM HAS ENTERED...",
+        description=(
+            f"Welcome {member.mention} to **{member.guild.name}**!\nYou are"
+            f" the **{count}{suffix}** trapped member in Mario's cartridge."
+            " There is no escape.. WAHOOO!!"
+            " <:mxsmile:1538591783645220965>"
+        ),
+        color=discord.Color.red(),
+    )
+    embed.set_image(
+        url="https://images-ext-1.discordapp.net/external/X9exZh596qntc15b6gERDH-PnS_xYOO32ibmRyYHOF0/%3Fq%3Dtbn%3AANd9GcQhG75XaBENR78fYYNUPjKxVef6zfX3dXTaaOAndsFQ2g%26s%3D10/https/encrypted-tbn0.gstatic.com/images?format=webp"
+    )
+    embed.set_thumbnail(url=member.display_avatar.url)
+    await channel.send(embed=embed)
 
-GOODBYE_CHANNEL_ID = 1523305137685135501
 
+# --- GOODBYE SYSTEM ---
 @bot.event
 async def on_member_remove(member):
   channel = bot.get_channel(GOODBYE_CHANNEL_ID)
@@ -62,245 +132,621 @@ async def on_member_remove(member):
     )
     embed.set_thumbnail(url=member.display_avatar.url)
     await channel.send(embed=embed)
-      
-# /help command
+
+
+# --- /HELP COMMAND ---
 @bot.tree.command(name="help", description="Learn how to use MX Archive")
 async def help_command(interaction: discord.Interaction):
-    embed = discord.Embed(
-        title="<:mxsmile:1538591783645220965> MX Archive - Help Menu",
-        description="Here is everything you can do with MX Archive! <:mxflower:1538616023928799363>",
-        color=discord.Color.red()
-    )
-    
-    embed.add_field(
-        name="• <:mx:1538614409902170212> - `/madness` commands",
-        value=(
-            "`/madness flipoff @user` - Flip off a user\n"
-            "`/madness kill @user` - Kill a user\n"
-            "`/madness laugh @user` - Laugh at a user\n"
-            "*(More reaction commands coming soon! )*"
-        ),
-        inline=False
-    )
-    
-    embed.add_field(
-        name="• <:music:1538614127659061359> - Automatic Triggers (Chat)",
-        value=(
-            "- Mention song names in chat (example: `starman slaughter`, `all stars`, `its a me`) to play gif embeds!\n"
-            "- Try saying `i hate mx` in chat if you dare... <:mxsmile:1538591783645220965>"
-        ),
-        inline=False
-    )
-    
-    embed.add_field(
-        name="• <:mushroome:1538614584435277996> - embeds",
-        value="• Embed Builder for anything u want lol.",
-        inline=False
-    )
-    
-    embed.set_footer(text="MX Archive - Mario's Madness Bot")
-    await interaction.response.send_message(embed=embed)
+  embed = discord.Embed(
+      title="<:mxsmile:1538591783645220965> MX Archive - Help Menu",
+      description=(
+          "Here is everything you can do with MX Archive!"
+          " <:mxflower:1538616023928799363>"
+      ),
+      color=discord.Color.red(),
+  )
 
-# madness reaction stuff 
+  embed.add_field(
+      name="• <:mx:1538614409902170212> - `/madness` commands",
+      value=(
+          "`/madness flipoff @user` - Flip off a user\n"
+          "`/madness kill @user` - Kill a user\n"
+          "`/madness laugh @user` - Laugh at a user"
+      ),
+      inline=False,
+  )
+
+  embed.add_field(
+      name="• 📊 - Leveling & Rank Commands",
+      value=(
+          "`/rank [user]` - Check your level or another user's level\n"
+          "`/leaderboard` - View the server level leaderboard\n"
+          "*(Admins: Use `/addxp`, `/removexp`, or `/setlevel` to manage XP)*"
+      ),
+      inline=False,
+  )
+
+  embed.add_field(
+      name="• <:music:1538614127659061359> - Automatic Triggers (Chat)",
+      value=(
+          "- Mention song names in chat (example: `starman slaughter`, `all"
+          " stars`, `its a me`) to play gif embeds!\n"
+          "- Try saying `i hate mx` in chat if you dare..."
+          " <:mxsmile:1538591783645220965>"
+      ),
+      inline=False,
+  )
+
+  embed.add_field(
+      name="• <:mushroome:1538614584435277996> - Embeds",
+      value="• `/embedbuilder` - Custom Embed Builder for anything u want.",
+      inline=False,
+  )
+
+  embed.set_footer(text="MX Archive - Mario's Madness Bot")
+  await interaction.response.send_message(embed=embed)
+
+
+# --- MADNESS REACTIONS ---
 class MadnessGroup(app_commands.Group):
-    def __init__(self):
-        super().__init__(name="madness", description="Mario's Madness interaction reactions")
+
+  def __init__(self):
+    super().__init__(
+        name="madness", description="Mario's Madness interaction reactions"
+    )
+
 
 madness_group = MadnessGroup()
 
+
 @madness_group.command(name="flipoff", description="flip off an annoying user")
 async def flipoff(interaction: discord.Interaction, target: discord.User):
-    embed = discord.Embed(
-        title=f"{interaction.user.display_name} flips off {target.display_name} <:fuckyoumx:1538591235927965726>",
-        description="fuck you",
-        color=discord.Color.red()
-    )
-    embed.set_image(url="https://i.pinimg.com/736x/d5/08/12/d5081271cdf82eb695611f101342db7b.jpg")
-    await interaction.response.send_message(embed=embed)
+  embed = discord.Embed(
+      title=(
+          f"{interaction.user.display_name} flips off {target.display_name}"
+          " <:fuckyoumx:1538591235927965726>"
+      ),
+      description="fuck you",
+      color=discord.Color.red(),
+  )
+  embed.set_image(
+      url="https://i.pinimg.com/736x/d5/08/12/d5081271cdf82eb695611f101342db7b.jpg"
+  )
+  await interaction.response.send_message(embed=embed)
+
 
 @madness_group.command(name="kill", description="kill a user")
 async def kill(interaction: discord.Interaction, target: discord.User):
-    embed = discord.Embed(
-        title=f"{interaction.user.display_name} kills {target.display_name} 💀💀",
-        description="DIE BITCH",
-        color=discord.Color.dark_red()
-    )
-    embed.set_image(url="https://i.pinimg.com/736x/bc/a7/35/bca735ecf4b651b7fabd80c5ea785ec4.jpg")
-    await interaction.response.send_message(embed=embed)
+  embed = discord.Embed(
+      title=f"{interaction.user.display_name} kills {target.display_name} 💀💀",
+      description="DIE BITCH",
+      color=discord.Color.dark_red(),
+  )
+  embed.set_image(
+      url="https://i.pinimg.com/736x/bc/a7/35/bca735ecf4b651b7fabd80c5ea785ec4.jpg"
+  )
+  await interaction.response.send_message(embed=embed)
+
 
 @madness_group.command(name="laugh", description="laugh ur ass off at a user")
 async def laugh(interaction: discord.Interaction, target: discord.User):
-    embed = discord.Embed(
-        title=f"{interaction.user.display_name} laughs at {target.display_name}!",
-        description="LMAOAOOAOAO",
-        color=discord.Color.gold()
-    )
-    embed.set_image(url="https://i.pinimg.com/736x/5f/e6/8c/5fe68c736527cba5a324626ec0943394.jpg")
-    await interaction.response.send_message(embed=embed)
+  embed = discord.Embed(
+      title=(
+          f"{interaction.user.display_name} laughs at {target.display_name}!"
+      ),
+      description="LMAOAOOAOAO",
+      color=discord.Color.gold(),
+  )
+  embed.set_image(
+      url="https://i.pinimg.com/736x/5f/e6/8c/5fe68c736527cba5a324626ec0943394.jpg"
+  )
+  await interaction.response.send_message(embed=embed)
+
 
 bot.tree.add_command(madness_group)
 
-#song trigger thing
-
+# --- SONG TRIGGERS ---
 SONG_TRIGGERS = {
-    "its a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
-    "it's-a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
-    "it's a me": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&",
-    "starman slaughter": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571763284451488/starman.gif?ex=6a832a1d&is=6a81d89d&hm=180c763376acb2b4d1dce7ebd9a26bdedae9fef7982f05759b6dc6a31c4549c9&",
-    "all stars": "https://cdn.discordapp.com/attachments/1538562192952266783/1544817186076495912/all-stars.gif?ex=6a99e29e&is=6a98911e&hm=fcb125e78bfadd5d02ec9e873bac7d0428b02dd51e8a7eb374a2d03a6b844fae&",
-    "all-stars": "https://cdn.discordapp.com/attachments/1538562192952266783/1544817186076495912/all-stars.gif?ex=6a99e29e&is=6a98911e&hm=fcb125e78bfadd5d02ec9e873bac7d0428b02dd51e8a7eb374a2d03a6b844fae&",
-    "all star": "https://cdn.discordapp.com/attachments/1538562192952266783/1544817643268079647/all-star.gif?ex=6a99e30b&is=6a98918b&hm=af376b6fbcb667c6dabb0fee801fd6677992524b8edaf20c329d750eeed33335&",
-    "so cool": "https://cdn.discordapp.com/attachments/1538562192952266783/1538568501940322315/so_cool.gif?ex=6a832714&is=6a81d594&hm=dd18a7bcc141fa0210b2c3ca5bfbe31386f8af12610e060833f4e875db34f1c2&",
-    "mario sing and game rhythm 9": "https://cdn.discordapp.com/attachments/1538562192952266783/1538567838879457320/msagr.gif?ex=6a832675&is=6a81d4f5&hm=e83769ac2b6b4c0ad4f85c703fc8491185b528f9490226573b4735d46ea1fdba&",
-    "nourishing blood": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577039521620118/nourishing-blood.gif?ex=6a832f07&is=6a81dd87&hm=9f76e749a19c85018551f9b43acbb73735a8a39cd46c456ec313b045db094a94&",
-    "nourish blood": "https://cdn.discordapp.com/attachments/1538562192952266783/1538577039521620118/nourishing-blood.gif?ex=6a832f07&is=6a81dd87&hm=9f76e749a19c85018551f9b43acbb73735a8a39cd46c456ec313b045db094a94&",
-    "alone": "https://cdn.discordapp.com/attachments/1538562192952266783/1544379073776717824/alone.gif?ex=6a984a98&is=6a96f918&hm=0bef7dcce04fdb526839e5233f42ec37bdbe7af38fe44b5bcf44344900243419&",
-    "oh god no": "https://cdn.discordapp.com/attachments/1538562192952266783/1538570662778507344/oh-god-no.gif?ex=6a832917&is=6a81d797&hm=4bed85b274b3bc9629b4eb3a847abd6293535e14917c1940ad2206aeddcefa25&",
-    "i hate you": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&",
-    "i hate u": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&",
-    "thalassophobia": "https://cdn.discordapp.com/attachments/1538562192952266783/1538571619893514330/thalassaphobia.gif?ex=6a8329fb&is=6a81d87b&hm=9109f505c83d27dc24daf9df7baf4d21f64dc3a20c7888ce79ce91ba42c7a9c0&",
-    "apparition": "https://cdn.discordapp.com/attachments/1538562192952266783/1538576341899939920/apparition.gif?ex=6a832e61&is=6a81dce1&hm=05e99f2d2f8ae7eda7089ef62022dc70c0ff1b7f7334b8a270cd929cc6804366&",
-    "last course": "https://cdn.discordapp.com/attachments/1538562192952266783/1538572792641880135/last-course.gif?ex=6a832b13&is=6a81d993&hm=27ee6e54e031c3d1ea3610a4ee2b1bd11f626f05cc5465e210f04ff95e6bf42d&",
-    "dark forest": "https://cdn.discordapp.com/attachments/1538562192952266783/1538576092569538600/dark-forest.gif?ex=6a832e25&is=6a81dca5&hm=666306bfb51d53319370bd5716b0833aba545218aa41d8e1be12261b32bc696d&",
-    "bad day": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197975456420001/bad-day.gif?ex=6a9ee894&is=6a9d9714&hm=68703ccaca663eaf6c976102f52ad2f2062245767b0e3e9ca848fd0dff1ba677&",
-    "day out": "https://cdn.discordapp.com/attachments/1412181326215254151/1546198976087195689/day-out.gif?ex=6a9ee982&is=6a9d9802&hm=7db81769c1566d7d56e71b9277dde2f9963a7b308d3a48099908ba9e05727966&",
-    "dictators": "https://cdn.discordapp.com/attachments/1538562192952266783/1544817194708500480/dictator.gif?ex=6a99e2a0&is=6a989120&hm=0afa3830f6b29ccf23fd0c3c8308884a77382d2bc38fcce476063433f49939e0&",
-    "dictator": "https://cdn.discordapp.com/attachments/1538562192952266783/1544817194708500480/dictator.gif?ex=6a99e2a0&is=6a989120&hm=0afa3830f6b29ccf23fd0c3c8308884a77382d2bc38fcce476063433f49939e0&",
-    "race traitors": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573362819768383/race-traitors.gif?ex=6a832b9b&is=6a81da1b&hm=37a88957ca526100f173f67c9d19718c889f55ad61b717e4423d706a478bebed&",
-    "race traitor": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573362819768383/race-traitors.gif?ex=6a832b9b&is=6a81da1b&hm=37a88957ca526100f173f67c9d19718c889f55ad61b717e4423d706a478bebed&",
-    "no hope": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573901091700869/no-hope.gif?ex=6a832c1b&is=6a81da9b&hm=c81009902dea388ab0330b18e981734d7b120ed508c7eca0d7b958420e12f526&",
-    "no party": "https://cdn.discordapp.com/attachments/1412181326215254151/1546934190224838696/no-party.gif?ex=6aa1963b&is=6aa044bb&hm=38b7996069980083e1b7f3dfccab99ae315c5b0da8e197ac6141fa350e125c3b&",
-    "piracy": "https://cdn.discordapp.com/attachments/1412181326215254151/1546934190224838696/no-party.gif?ex=6aa1963b&is=6aa044bb&hm=38b7996069980083e1b7f3dfccab99ae315c5b0da8e197ac6141fa350e125c3b&",
-    "golden land": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197989213606078/golden-land.gif?ex=6a9ee897&is=6a9d9717&hm=3dc6be303c1b5256f8af1c6387e533fc92f15fcdb13910120225566b13786278&",
-    "paranoid": "https://cdn.discordapp.com/attachments/1538562192952266783/1538572322762657832/paranoia.gif?ex=6a832aa3&is=6a81d923&hm=b378de278400c4c4c519eedea61b343e39c4ae953703fbd5999a0caa4d3bb61e&",
-    "paranoia": "https://cdn.discordapp.com/attachments/1538562192952266783/1538572322762657832/paranoia.gif?ex=6a832aa3&is=6a81d923&hm=b378de278400c4c4c519eedea61b343e39c4ae953703fbd5999a0caa4d3bb61e&",
-    "too late": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575627756765186/overdue.gif?ex=6a832db7&is=6a81dc37&hm=77d9c40349d6cc7c2634a4c83bbc98d36a5c8242a396d66b2a6661bb4e95d295&",
-    "overdue": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575627756765186/overdue.gif?ex=6a832db7&is=6a81dc37&hm=77d9c40349d6cc7c2634a4c83bbc98d36a5c8242a396d66b2a6661bb4e95d295&",
-    "powerdown": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573982066941982/powerdown.gif?ex=6a832c2e&is=6a81daae&hm=54d43134f178ae06502b55284b1f8da6e0f50c7d772471acd4b38608a8452544&",
-    "demise": "https://cdn.discordapp.com/attachments/1538562192952266783/1538574264909692958/demise.gif?ex=6a832c72&is=6a81daf2&hm=8b05780065098d1695d49cc94b983f15920509609661d1259d2a11e772517af8&",
-    "promotion": "https://cdn.discordapp.com/attachments/1538562192952266783/1538573354964094976/promotion.gif?ex=6a832b99&is=6a81da19&hm=e148160af159b597f97768dc8d0eb4079f9a3979228d530cde3c0cbc280c5f40&",
-    "abandoned": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575345710800906/abandoned.gif?ex=6a832d73&is=6a81dbf3&hm=ec12d889fff070d6ad079254142ae90d4453a00f717daa579ff44a6d72c475ef&",
-    "the end": "https://cdn.discordapp.com/attachments/1538562192952266783/1538575019989270619/the-end.gif?ex=6a832d26&is=6a81dba6&hm=9be2b19d4c43fe8d87ad7f65e90742073716c7d913a85a93766aab504d9a40ea&",
-    "you cannot beat us": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197939657900082/you-cannot-beat-us.gif?ex=6a9ee88b&is=6a9d970b&hm=8ee848caf13841f6c78fbb4b346edf19d1ecc7a69ff23f9e8ef14422e0649707&",
-    "unbeatable": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197911535222927/unbeatable.gif?ex=6a9ee885&is=6a9d9705&hm=beefc1a3d9426a06e273ee11eb65874155441b318dd6dccffbb90d0f4bc2ee8b&",
-    "iason mason": "https://cdn.discordapp.com/attachments/1538562192952266783/1544375439366033508/BAHHH.gif?ex=6a984735&is=6a96f5b5&hm=c96c084c718d6d05b8e8ffa3b8eae48fed5e14a1d9890395c2a135cea66dfeab&",
-    "secret exit": "https://cdn.discordapp.com/attachments/1538562192952266783/1544393783557226496/secret.gif?ex=6a98584b&is=6a9706cb&hm=47139c0c96642f3ad3415aea56689167b9a4585540be5fbb4e8cbea37232d1a0&",
-    "wahoo hoo hoo": "https://cdn.discordapp.com/attachments/1412181326215254151/1546197885438398615/wahoo-hoo-hoo.gif?ex=6a9ee87e&is=6a9d96fe&hm=cebb0228ce372bfd31d12692eaa068f83b1ff832e4f76a33f912a080194bea3e&",
-    "burger": "https://cdn.discordapp.com/attachments/1412181326215254151/1548342384369205279/burger.gif?ex=6aa6b5b7&is=6aa56437&hm=d1ece91e9e42afa334985703159a3a2ff855e1b8b3d21607a97f2ab7714c0372&"
+    "its a me": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&"
+    ),
+    "it's-a me": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&"
+    ),
+    "it's a me": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538570637134659705/its-a-me.gif?ex=6a832911&is=6a81d791&hm=d5baba022c476c58ad57fa92f882a36f31034853d5dff746507e007273fe224f&"
+    ),
+    "starman slaughter": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538571763284451488/starman.gif?ex=6a832a1d&is=6a81d89d&hm=180c763376acb2b4d1dce7ebd9a26bdedae9fef7982f05759b6dc6a31c4549c9&"
+    ),
+    "all stars": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1544817186076495912/all-stars.gif?ex=6a99e29e&is=6a98911e&hm=fcb125e78bfadd5d02ec9e873bac7d0428b02dd51e8a7eb374a2d03a6b844fae&"
+    ),
+    "all-stars": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1544817186076495912/all-stars.gif?ex=6a99e29e&is=6a98911e&hm=fcb125e78bfadd5d02ec9e873bac7d0428b02dd51e8a7eb374a2d03a6b844fae&"
+    ),
+    "all star": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1544817643268079647/all-star.gif?ex=6a99e30b&is=6a98918b&hm=af376b6fbcb667c6dabb0fee801fd6677992524b8edaf20c329d750eeed33335&"
+    ),
+    "so cool": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538568501940322315/so_cool.gif?ex=6a832714&is=6a81d594&hm=dd18a7bcc141fa0210b2c3ca5bfbe31386f8af12610e060833f4e875db34f1c2&"
+    ),
+    "mario sing and game rhythm 9": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538567838879457320/msagr.gif?ex=6a832675&is=6a81d4f5&hm=e83769ac2b6b4c0ad4f85c703fc8491185b528f9490226573b4735d46ea1fdba&"
+    ),
+    "nourishing blood": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538577039521620118/nourishing-blood.gif?ex=6a832f07&is=6a81dd87&hm=9f76e749a19c85018551f9b43acbb73735a8a39cd46c456ec313b045db094a94&"
+    ),
+    "nourish blood": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538577039521620118/nourishing-blood.gif?ex=6a832f07&is=6a81dd87&hm=9f76e749a19c85018551f9b43acbb73735a8a39cd46c456ec313b045db094a94&"
+    ),
+    "alone": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1544379073776717824/alone.gif?ex=6a984a98&is=6a96f918&hm=0bef7dcce04fdb526839e5233f42ec37bdbe7af38fe44b5bcf44344900243419&"
+    ),
+    "oh god no": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538570662778507344/oh-god-no.gif?ex=6a832917&is=6a81d797&hm=4bed85b274b3bc9629b4eb3a847abd6293535e14917c1940ad2206aeddcefa25&"
+    ),
+    "i hate you": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&"
+    ),
+    "i hate u": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538571042958872707/i-hate-you.gif?ex=6a832971&is=6a81d7f1&hm=8ec57cb332484fdc6d01770b597a60e1855d97b523718bc889e055aa4b4f99be&"
+    ),
+    "thalassophobia": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538571619893514330/thalassaphobia.gif?ex=6a8329fb&is=6a81d87b&hm=9109f505c83d27dc24daf9df7baf4d21f64dc3a20c7888ce79ce91ba42c7a9c0&"
+    ),
+    "apparition": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538576341899939920/apparition.gif?ex=6a832e61&is=6a81dce1&hm=05e99f2d2f8ae7eda7089ef62022dc70c0ff1b7f7334b8a270cd929cc6804366&"
+    ),
+    "last course": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538572792641880135/last-course.gif?ex=6a832b13&is=6a81d993&hm=27ee6e54e031c3d1ea3610a4ee2b1bd11f626f05cc5465e210f04ff95e6bf42d&"
+    ),
+    "dark forest": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538576092569538600/dark-forest.gif?ex=6a832e25&is=6a81dca5&hm=666306bfb51d53319370bd5716b0833aba545218aa41d8e1be12261b32bc696d&"
+    ),
+    "bad day": (
+        "https://cdn.discordapp.com/attachments/1412181326215254151/1546197975456420001/bad-day.gif?ex=6a9ee894&is=6a9d9714&hm=68703ccaca663eaf6c976102f52ad2f2062245767b0e3e9ca848fd0dff1ba677&"
+    ),
+    "day out": (
+        "https://cdn.discordapp.com/attachments/1412181326215254151/1546198976087195689/day-out.gif?ex=6a9ee982&is=6a9d9802&hm=7db81769c1566d7d56e71b9277dde2f9963a7b308d3a48099908ba9e05727966&"
+    ),
+    "dictators": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1544817194708500480/dictator.gif?ex=6a99e2a0&is=6a989120&hm=0afa3830f6b29ccf23fd0c3c8308884a77382d2bc38fcce476063433f49939e0&"
+    ),
+    "dictator": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1544817194708500480/dictator.gif?ex=6a99e2a0&is=6a989120&hm=0afa3830f6b29ccf23fd0c3c8308884a77382d2bc38fcce476063433f49939e0&"
+    ),
+    "race traitors": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538573362819768383/race-traitors.gif?ex=6a832b9b&is=6a81da1b&hm=37a88957ca526100f173f67c9d19718c889f55ad61b717e4423d706a478bebed&"
+    ),
+    "race traitor": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538573362819768383/race-traitors.gif?ex=6a832b9b&is=6a81da1b&hm=37a88957ca526100f173f67c9d19718c889f55ad61b717e4423d706a478bebed&"
+    ),
+    "no hope": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538573901091700869/no-hope.gif?ex=6a832c1b&is=6a81da9b&hm=c81009902dea388ab0330b18e981734d7b120ed508c7eca0d7b958420e12f526&"
+    ),
+    "no party": (
+        "https://cdn.discordapp.com/attachments/1412181326215254151/1546934190224838696/no-party.gif?ex=6aa1963b&is=6aa044bb&hm=38b7996069980083e1b7f3dfccab99ae315c5b0da8e197ac6141fa350e125c3b&"
+    ),
+    "piracy": (
+        "https://cdn.discordapp.com/attachments/1412181326215254151/1546934190224838696/no-party.gif?ex=6aa1963b&is=6aa044bb&hm=38b7996069980083e1b7f3dfccab99ae315c5b0da8e197ac6141fa350e125c3b&"
+    ),
+    "golden land": (
+        "https://cdn.discordapp.com/attachments/1412181326215254151/1546197989213606078/golden-land.gif?ex=6a9ee897&is=6a9d9717&hm=3dc6be303c1b5256f8af1c6387e533fc92f15fcdb13910120225566b13786278&"
+    ),
+    "paranoid": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538572322762657832/paranoia.gif?ex=6a832aa3&is=6a81d923&hm=b378de278400c4c4c519eedea61b343e39c4ae953703fbd5999a0caa4d3bb61e&"
+    ),
+    "paranoia": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538572322762657832/paranoia.gif?ex=6a832aa3&is=6a81d923&hm=b378de278400c4c4c519eedea61b343e39c4ae953703fbd5999a0caa4d3bb61e&"
+    ),
+    "too late": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538575627756765186/overdue.gif?ex=6a832db7&is=6a81dc37&hm=77d9c40349d6cc7c2634a4c83bbc98d36a5c8242a396d66b2a6661bb4e95d295&"
+    ),
+    "overdue": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538575627756765186/overdue.gif?ex=6a832db7&is=6a81dc37&hm=77d9c40349d6cc7c2634a4c83bbc98d36a5c8242a396d66b2a6661bb4e95d295&"
+    ),
+    "powerdown": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538573982066941982/powerdown.gif?ex=6a832c2e&is=6a81daae&hm=54d43134f178ae06502b55284b1f8da6e0f50c7d772471acd4b38608a8452544&"
+    ),
+    "demise": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538574264909692958/demise.gif?ex=6a832c72&is=6a81daf2&hm=8b05780065098d1695d49cc94b983f15920509609661d1259d2a11e772517af8&"
+    ),
+    "promotion": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538573354964094976/promotion.gif?ex=6a832b99&is=6a81da19&hm=e148160af159b597f97768dc8d0eb4079f9a3979228d530cde3c0cbc280c5f40&"
+    ),
+    "abandoned": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538575345710800906/abandoned.gif?ex=6a832d73&is=6a81dbf3&hm=ec12d889fff070d6ad079254142ae90d4453a00f717daa579ff44a6d72c475ef&"
+    ),
+    "the end": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1538575019989270619/the-end.gif?ex=6a832d26&is=6a81dba6&hm=9be2b19d4c43fe8d87ad7f65e90742073716c7d913a85a93766aab504d9a40ea&"
+    ),
+    "you cannot beat us": (
+        "https://cdn.discordapp.com/attachments/1412181326215254151/1546197939657900082/you-cannot-beat-us.gif?ex=6a9ee88b&is=6a9d970b&hm=8ee848caf13841f6c78fbb4b346edf19d1ecc7a69ff23f9e8ef14422e0649707&"
+    ),
+    "unbeatable": (
+        "https://cdn.discordapp.com/attachments/1412181326215254151/1546197911535222927/unbeatable.gif?ex=6a9ee885&is=6a9d9705&hm=beefc1a3d9426a06e273ee11eb65874155441b318dd6dccffbb90d0f4bc2ee8b&"
+    ),
+    "iason mason": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1544375439366033508/BAHHH.gif?ex=6a984735&is=6a96f5b5&hm=c96c084c718d6d05b8e8ffa3b8eae48fed5e14a1d9890395c2a135cea66dfeab&"
+    ),
+    "secret exit": (
+        "https://cdn.discordapp.com/attachments/1538562192952266783/1544393783557226496/secret.gif?ex=6a98584b&is=6a9706cb&hm=47139c0c96642f3ad3415aea56689167b9a4585540be5fbb4e8cbea37232d1a0&"
+    ),
+    "wahoo hoo hoo": (
+        "https://cdn.discordapp.com/attachments/1412181326215254151/1546197885438398615/wahoo-hoo-hoo.gif?ex=6a9ee87e&is=6a9d96fe&hm=cebb0228ce372bfd31d12692eaa068f83b1ff832e4f76a33f912a080194bea3e&"
+    ),
+    "burger": (
+        "https://cdn.discordapp.com/attachments/1412181326215254151/1548342384369205279/burger.gif?ex=6aa6b5b7&is=6aa56437&hm=d1ece91e9e42afa334985703159a3a2ff855e1b8b3d21607a97f2ab7714c0372&"
+    ),
 }
 
-# status shit
 
+# --- BOT READY EVENT ---
 @bot.event
 async def on_ready():
-    activity = discord.Activity(type=discord.ActivityType.listening, name="POWERDOWN")
-    await bot.change_presence(status=discord.Status.dnd, activity=activity)
+  activity = discord.Activity(
+      type=discord.ActivityType.listening, name="POWERDOWN"
+  )
+  await bot.change_presence(status=discord.Status.dnd, activity=activity)
 
-    try:
-        synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} command(s) globally!")
-    except Exception as e:
-        print(f"Failed to sync commands: {e}")
+  try:
+    synced = await bot.tree.sync()
+    print(f"Synced {len(synced)} command(s) globally!")
+  except Exception as e:
+    print(f"Failed to sync commands: {e}")
 
-    print(f"Logged in as {bot.user.name}!")
+  print(f"Logged in as {bot.user.name}!")
 
+
+# --- ON MESSAGE EVENT (TRIGGERS & XP GAINS) ---
 @bot.event
 async def on_message(message: discord.Message):
-    if message.author.bot:
-        return
+  if message.author.bot or not message.guild:
+    return
 
-    content_lower = message.content.lower()
+  user_id_str = str(message.author.id)
+  current_time = time.time()
 
-    # hate mx trigger
-    if "i hate mx" in content_lower:
-        embed = discord.Embed(color=discord.Color.dark_red())
-        # gif
-        embed.set_image(url="https://cdn.discordapp.com/attachments/1538562192952266783/1543638305621540954/DIE_1.gif?ex=6a9598b3&is=6a944733&hm=3b0f012e0a246fbcad439198a7de494dccb77d03b82a05f5e00f41b68b3ba493&")
-        await message.channel.send(embed=embed)
-        return
+  # 60-second cooldown per user to prevent XP spamming
+  if (
+      user_id_str not in xp_cooldowns
+      or current_time - xp_cooldowns[user_id_str] >= 60
+  ):
+    xp_cooldowns[user_id_str] = current_time
+    xp_earned = random.randint(15, 25)
+    leveled_up, new_level, _ = add_xp_to_user(user_id_str, xp_earned)
 
-    # hate mx trigger the second one.
-    if "fuck mx" in content_lower:
-        embed = discord.Embed(color=discord.Color.dark_red())
-        # gif
-        embed.set_image(url="https://cdn.discordapp.com/attachments/1538562192952266783/1543638305621540954/DIE_1.gif?ex=6a9598b3&is=6a944733&hm=3b0f012e0a246fbcad439198a7de494dccb77d03b82a05f5e00f41b68b3ba493&")
-        await message.channel.send(embed=embed)
-        return
+if leveled_up:
+      embed = discord.Embed(
+          title="🎉 LEVEL UP!",
+          description=(
+              f"{message.author.mention} has survived enough to reach **Level"
+              f" {new_level}**!"
+          ),
+          color=discord.Color.gold(),
+      )
+      embed.set_thumbnail(url=message.author.display_avatar.url)
 
- # love mx trigger
-    if "i love mx" in content_lower:
-        embed = discord.Embed(color=discord.Color.dark_red())
-        # gif 
-        embed.set_image(url="https://cdn.discordapp.com/attachments/1538562192952266783/1543646444492292166/Video_Project_10.gif?ex=6a95a047&is=6a944ec7&hm=ee56ee878fb23e09eacc59175b7171fa040e779e25b45eec8fc789772f1c2365&")
-        await message.channel.send(embed=embed)
-        return
+      # Send to dedicated channel if it exists, otherwise fall back to current chat
+      level_channel = message.guild.get_channel(LEVEL_CHANNEL_ID)
+      target_channel = level_channel if level_channel else message.channel
 
-    # kys trigger
-    if "kill yourself" in content_lower:
-        embed = discord.Embed(color=discord.Color.dark_red())
-        # i miss mario... KILL YOURSE- anyway, gif.
-        embed.set_image(url="https://cdn.discordapp.com/attachments/1412181326215254151/1547692415794806794/kys.gif?ex=6aa45862&is=6aa306e2&hm=3b4b977b505aa53f7abec3ac7c94e1280da4e819be4fe08f29f1a84a08e4b269&")
-        await message.channel.send(embed=embed)
-        return
+      await target_channel.send(embed=embed)
 
-    # song trigger message
-
-    for song_title, gif_url in SONG_TRIGGERS.items():
-        if song_title in content_lower:
-            embed = discord.Embed(
-                title=f"👀 Did someone say {song_title.title()}???",
-                color=discord.Color.red()
+      # Check for role reward
+      if new_level in LEVEL_ROLES:
+        role_name = LEVEL_ROLES[new_level]
+        role = discord.utils.get(message.guild.roles, name=role_name)
+        if role:
+          try:
+            await message.author.add_roles(role)
+            await target_channel.send(
+                f"🏆 {message.author.mention} unlocked the **{role.name}** role!"
             )
-            embed.set_image(url=gif_url)
-            await message.channel.send(embed=embed)
-            break
+          except discord.Forbidden:
+            pass
 
-    await bot.process_commands(message)
+  content_lower = message.content.lower()
+
+  # Triggers
+  if "i hate mx" in content_lower or "fuck mx" in content_lower:
+    embed = discord.Embed(color=discord.Color.dark_red())
+    embed.set_image(
+        url="https://cdn.discordapp.com/attachments/1538562192952266783/1543638305621540954/DIE_1.gif?ex=6a9598b3&is=6a944733&hm=3b0f012e0a246fbcad439198a7de494dccb77d03b82a05f5e00f41b68b3ba493&"
+    )
+    await message.channel.send(embed=embed)
+    return
+
+  if "i love mx" in content_lower:
+    embed = discord.Embed(color=discord.Color.dark_red())
+    embed.set_image(
+        url="https://cdn.discordapp.com/attachments/1538562192952266783/1543646444492292166/Video_Project_10.gif?ex=6a95a047&is=6a944ec7&hm=ee56ee878fb23e09eacc59175b7171fa040e779e25b45eec8fc789772f1c2365&"
+    )
+    await message.channel.send(embed=embed)
+    return
+
+  if "kill yourself" in content_lower:
+    embed = discord.Embed(color=discord.Color.dark_red())
+    embed.set_image(
+        url="https://cdn.discordapp.com/attachments/1412181326215254151/1547692415794806794/kys.gif?ex=6aa45862&is=6aa306e2&hm=3b4b977b505aa53f7abec3ac7c94e1280da4e819be4fe08f29f1a84a08e4b269&"
+    )
+    await message.channel.send(embed=embed)
+    return
+
+  for song_title, gif_url in SONG_TRIGGERS.items():
+    if song_title in content_lower:
+      embed = discord.Embed(
+          title=f"👀 Did someone say {song_title.title()}???",
+          color=discord.Color.red(),
+      )
+      embed.set_image(url=gif_url)
+      await message.channel.send(embed=embed)
+      break
+
+  await bot.process_commands(message)
 
 
-# embed builder command
+# --- EMBED BUILDER MODAL ---
 class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
-    embed_title = discord.ui.TextInput(label="Title", placeholder="Enter embed title...", required=True)
-    description = discord.ui.TextInput(label="Description", style=discord.TextStyle.paragraph, placeholder="Enter main text/description here...", required=True)
-    color_hex = discord.ui.TextInput(label="Color (Hex Code)", placeholder="e.g. #FF5733", required=False)
-    image_url = discord.ui.TextInput(label="Main Image URL", placeholder="https://example.com/image.png (Optional)", required=False)
-    thumbnail_url = discord.ui.TextInput(label="Thumbnail Image URL", placeholder="https://example.com/thumb.png (Optional)", required=False)
 
-    async def on_submit(self, interaction: discord.Interaction):
-        color_val = discord.Color.blurple()
-        if self.color_hex.value:
-            hex_str = self.color_hex.value.lstrip('#')
-            try:
-                color_val = discord.Color(int(hex_str, 16))
-            except ValueError:
-                pass
+  embed_title = discord.ui.TextInput(
+      label="Title", placeholder="Enter embed title...", required=True
+  )
+  description = discord.ui.TextInput(
+      label="Description",
+      style=discord.TextStyle.paragraph,
+      placeholder="Enter main text/description here...",
+      required=True,
+  )
+  color_hex = discord.ui.TextInput(
+      label="Color (Hex Code)", placeholder="e.g. #FF5733", required=False
+  )
+  image_url = discord.ui.TextInput(
+      label="Main Image URL",
+      placeholder="https://example.com/image.png (Optional)",
+      required=False,
+  )
+  thumbnail_url = discord.ui.TextInput(
+      label="Thumbnail Image URL",
+      placeholder="https://example.com/thumb.png (Optional)",
+      required=False,
+  )
 
-        embed = discord.Embed(title=self.embed_title.value, description=self.description.value, color=color_val)
-        if self.image_url.value:
-            embed.set_image(url=self.image_url.value)
-        if self.thumbnail_url.value:
-            embed.set_thumbnail(url=self.thumbnail_url.value)
-        embed.set_footer(text=f"Created by {interaction.user.display_name}", icon_url=interaction.user.display_avatar.url)
+  async def on_submit(self, interaction: discord.Interaction):
+    color_val = discord.Color.blurple()
+    if self.color_hex.value:
+      hex_str = self.color_hex.value.lstrip("#")
+      try:
+        color_val = discord.Color(int(hex_str, 16))
+      except ValueError:
+        pass
 
-        await interaction.response.send_message(embed=embed)
+    embed = discord.Embed(
+        title=self.embed_title.value,
+        description=self.description.value,
+        color=color_val,
+    )
+    if self.image_url.value:
+      embed.set_image(url=self.image_url.value)
+    if self.thumbnail_url.value:
+      embed.set_thumbnail(url=self.thumbnail_url.value)
+    embed.set_footer(
+        text=f"Created by {interaction.user.display_name}",
+        icon_url=interaction.user.display_avatar.url,
+    )
+
+    await interaction.response.send_message(embed=embed)
+
 
 @bot.tree.command(name="embedbuilder", description="Create a custom embed")
 async def embedbuilder(interaction: discord.Interaction):
-    await interaction.response.send_modal(EmbedBuilderModal())
+  await interaction.response.send_modal(EmbedBuilderModal())
 
-# async bot runner
+
+# --- LEVELING SLASH COMMANDS ---
+
+
+@bot.tree.command(
+    name="rank", description="Check your current level and XP rank"
+)
+async def rank(
+    interaction: discord.Interaction, target: discord.Member | None = None
+):
+  target_user = target or interaction.user
+  data = load_data()
+  user_data = data.get(str(target_user.id), {"xp": 0, "level": 1})
+
+  level = user_data["level"]
+  xp = user_data["xp"]
+  next_level_xp = get_xp_for_level(level)
+
+  # Progress bar generation
+  prev_level_xp = get_xp_for_level(level - 1) if level > 1 else 0
+  needed_xp = next_level_xp - prev_level_xp
+  current_progress = xp - prev_level_xp
+
+  progress_percent = min(max(current_progress / max(needed_xp, 1), 0.0), 1.0)
+  filled_blocks = int(progress_percent * 10)
+  progress_bar = "🟦" * filled_blocks + "⬛" * (10 - filled_blocks)
+
+  embed = discord.Embed(
+      title=f"📊 Rank Card - {target_user.display_name}",
+      color=discord.Color.red(),
+  )
+  embed.set_thumbnail(url=target_user.display_avatar.url)
+  embed.add_field(name="Level", value=f"**{level}**", inline=True)
+  embed.add_field(
+      name="Total XP", value=f"**{xp} / {next_level_xp} XP**", inline=True
+  )
+  embed.add_field(
+      name="Progress",
+      value=f"{progress_bar} ({int(progress_percent * 100)}%)",
+      inline=False,
+  )
+
+  await interaction.response.send_message(embed=embed)
+
+
+@bot.tree.command(
+    name="leaderboard", description="View top levels in the server"
+)
+async def leaderboard(interaction: discord.Interaction):
+  data = load_data()
+  if not data:
+    await interaction.response.send_message(
+        "No leveling data recorded yet!", ephemeral=True
+    )
+    return
+
+  sorted_users = sorted(
+      data.items(), key=lambda item: item[1]["xp"], reverse=True
+  )[:10]
+
+  embed = discord.Embed(
+      title="🏆 Cartridge Survival Leaderboard", color=discord.Color.gold()
+  )
+
+  description = ""
+  for idx, (user_id, stats) in enumerate(sorted_users, 1):
+    member = interaction.guild.get_member(int(user_id))
+    name = member.display_name if member else f"User ID {user_id}"
+    description += f"**#{idx}** {name} • Level **{stats['level']}** ({stats['xp']} XP)\n"
+
+  embed.description = description
+  await interaction.response.send_message(embed=embed)
+
+
+# --- ADMIN ONLY LEVEL MANAGEMENT COMMANDS ---
+
+
+@bot.tree.command(
+    name="addxp", description="[Admin Only] Add XP to a specific member"
+)
+@app_commands.checks.has_permissions(administrator=True)
+async def addxp(
+    interaction: discord.Interaction, target: discord.Member, amount: int
+):
+  if amount <= 0:
+    await interaction.response.send_message(
+        "Amount must be greater than 0!", ephemeral=True
+    )
+    return
+
+  leveled_up, new_level, new_xp = add_xp_to_user(str(target.id), amount)
+
+  embed = discord.Embed(
+      title="⚡ XP Granted!",
+      description=(
+          f"Added **{amount} XP** to {target.mention}.\nTotal XP:"
+          f" **{new_xp}** (Level **{new_level}**)"
+      ),
+      color=discord.Color.green(),
+  )
+  await interaction.response.send_message(embed=embed)
+
+
+@bot.tree.command(
+    name="removexp",
+    description="[Admin Only] Remove XP from a specific member",
+)
+@app_commands.checks.has_permissions(administrator=True)
+async def removexp(
+    interaction: discord.Interaction, target: discord.Member, amount: int
+):
+  if amount <= 0:
+    await interaction.response.send_message(
+        "Amount must be greater than 0!", ephemeral=True
+    )
+    return
+
+  data = load_data()
+  user_id_str = str(target.id)
+
+  if user_id_str not in data:
+    await interaction.response.send_message(
+        f"{target.display_name} has no XP recorded yet!", ephemeral=True
+    )
+    return
+
+  data[user_id_str]["xp"] = max(0, data[user_id_str]["xp"] - amount)
+
+  # Re-calculate level
+  current_xp = data[user_id_str]["xp"]
+  lvl = 1
+  while current_xp >= get_xp_for_level(lvl):
+    lvl += 1
+  data[user_id_str]["level"] = lvl
+
+  save_data(data)
+
+  embed = discord.Embed(
+      title="🔻 XP Deducted!",
+      description=(
+          f"Removed **{amount} XP** from {target.mention}.\nTotal XP:"
+          f" **{data[user_id_str]['xp']}** (Level **{data[user_id_str]['level']}**)"
+      ),
+      color=discord.Color.red(),
+  )
+  await interaction.response.send_message(embed=embed)
+
+
+@bot.tree.command(
+    name="setlevel",
+    description="[Admin Only] Manually set a member's level",
+)
+@app_commands.checks.has_permissions(administrator=True)
+async def setlevel(
+    interaction: discord.Interaction, target: discord.Member, level: int
+):
+  if level < 1:
+    await interaction.response.send_message(
+        "Level must be at least 1!", ephemeral=True
+    )
+    return
+
+  data = load_data()
+  user_id_str = str(target.id)
+
+  target_xp = get_xp_for_level(level - 1) if level > 1 else 0
+
+  data[user_id_str] = {"xp": target_xp, "level": level}
+  save_data(data)
+
+  embed = discord.Embed(
+      title="⚙️ Level Updated!",
+      description=f"Set {target.mention}'s level to **{level}**!",
+      color=discord.Color.blue(),
+  )
+  await interaction.response.send_message(embed=embed)
+
+
+# Catch admin permission errors gracefully
+@addxp.error
+@removexp.error
+@setlevel.error
+async def admin_command_error(
+    interaction: discord.Interaction, error: app_commands.AppCommandError
+):
+  if isinstance(error, app_commands.MissingPermissions):
+    await interaction.response.send_message(
+        "⛔ You don't have permission to use this admin command!",
+        ephemeral=True,
+    )
+
+
+# --- BOT THREAD & RUNNER ---
 def start_bot():
-    token = os.getenv("DISCORD_TOKEN") or os.getenv("TOKEN")
-    if token:
-        asyncio.run(bot.start(token))
-    else:
-        print("ERROR: DISCORD_TOKEN environment variable is not set!")
+  token = os.getenv("DISCORD_TOKEN") or os.getenv("TOKEN")
+  if token:
+    asyncio.run(bot.start(token))
+  else:
+    print("ERROR: DISCORD_TOKEN environment variable is not set!")
 
-# pew pew pew
+
 bot_thread = threading.Thread(target=start_bot, daemon=True)
 bot_thread.start()
 
-# for render
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host="0.0.0.0", port=port)
+  port = int(os.environ.get("PORT", 8080))
+  app.run(host="0.0.0.0", port=port)
