@@ -58,7 +58,7 @@ async def on_member_remove(member):
             f"**{member.name}** couldn't survive the cartridge and left the"
             " server. We'll catch that little rat next time..."
         ),
-        color=discord.Color.dark_gray(),
+        color=discord.Color.dark_red(),
     )
     embed.set_thumbnail(url=member.display_avatar.url)
     await channel.send(embed=embed)
