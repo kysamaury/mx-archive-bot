@@ -44,7 +44,7 @@ async def on_member_join(member: discord.Member):
         
         await channel.send(embed=embed)
 
-#goodbye system or shii
+#goodbye system
 
 GOODBYE_CHANNEL_ID = 1523305137685135501
 
@@ -214,7 +214,7 @@ async def on_message(message: discord.Message):
     # hate mx trigger
     if "i hate mx" in content_lower:
         embed = discord.Embed(color=discord.Color.dark_red())
-        # fucking gif link FUCK my life.
+        # gif
         embed.set_image(url="https://cdn.discordapp.com/attachments/1538562192952266783/1543638305621540954/DIE_1.gif?ex=6a9598b3&is=6a944733&hm=3b0f012e0a246fbcad439198a7de494dccb77d03b82a05f5e00f41b68b3ba493&")
         await message.channel.send(embed=embed)
         return
