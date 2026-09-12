@@ -22,6 +22,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 # welcome system
 WELCOME_CHANNEL_ID = 1495794831136395275
+GOODBYE_CHANNEL_ID = 1538562192952266783
 @bot.event
 async def on_member_join(member: discord.Member):
     channel = member.guild.get_channel(WELCOME_CHANNEL_ID)
@@ -43,7 +44,29 @@ async def on_member_join(member: discord.Member):
         embed.set_thumbnail(url=member.display_avatar.url)
         
         await channel.send(embed=embed)
-        
+
+# goodbye system 
+
+@bot.event
+async def on_member_remove(member):
+  # Looks for your welcome/goodbye channel
+  channel = discord.utils.get(
+      member.guild.text_channels, name=GOODBYE_CHANNEL_ID
+  )
+
+  if channel:
+    embed = discord.Embed(
+        title="DAMN IT",
+        description=(
+            f"**{member.name}** couldn't handle the Mario's Madness cartridge"
+            " and left the server. We'll catch that little rat next time..."
+        ),
+        color=discord.Color.dark_red(),
+    )
+    embed.set_thumbnail(url=member.display_avatar.url)
+
+    await channel.send(embed=embed)
+      
 # /help command
 @bot.tree.command(name="help", description="Learn how to use MX Archive")
 async def help_command(interaction: discord.Interaction):
