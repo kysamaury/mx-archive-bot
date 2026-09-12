@@ -46,7 +46,7 @@ async def on_member_join(member: discord.Member):
 
 #goodbye system or shii
 
-GOODBYE_CHANNEL_ID = 1538562192952266783
+GOODBYE_CHANNEL_ID = 1523305137685135501
 
 @bot.event
 async def on_member_remove(member):
