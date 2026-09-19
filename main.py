@@ -44,24 +44,6 @@ async def on_member_join(member: discord.Member):
         
         await channel.send(embed=embed)
 
-#goodbye system or shii
-
-GOODBYE_CHANNEL_ID = 1523305137685135501
-
-@bot.event
-async def on_member_remove(member):
-  channel = bot.get_channel(GOODBYE_CHANNEL_ID)
-  if channel:
-    embed = discord.Embed(
-        title="DAMN IT..",
-        description=(
-            f"**{member.name}** couldn't survive the cartridge and left the"
-            " server. We'll catch that little rat next time..."
-        ),
-        color=discord.Color.dark_red(),
-    )
-    embed.set_thumbnail(url=member.display_avatar.url)
-    await channel.send(embed=embed)
       
 # /help command
 @bot.tree.command(name="help", description="Learn how to use MX Archive")
