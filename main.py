@@ -239,6 +239,19 @@ async def on_message(message: discord.Message):
 
     await bot.process_commands(message)
 
+# leave the fuckass server
+
+@bot.event
+async def on_ready():
+    print(f'Logged in as {bot.user}')
+    
+    # Replace with the actual target Server ID (as an integer, no quotes)
+    target_guild_id = 1495160136015151164
+    
+    guild = bot.get_guild(target_guild_id)
+    if guild:
+        await guild.leave()
+        print(f"Successfully left {guild.name}")
 
 # embed builder command
 class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
