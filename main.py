@@ -20,31 +20,7 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# welcome system
-WELCOME_CHANNEL_ID = 1495794831136395275
-@bot.event
-async def on_member_join(member: discord.Member):
-    channel = member.guild.get_channel(WELCOME_CHANNEL_ID)
-    
-    if channel:
-        # suffix helper for member count
-        count = member.guild.member_count
-        suffix = "th" if 11 <= count % 100 <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(count % 10, "th")
-        
-        embed = discord.Embed(
-            title="A NEW VICTIM HAS ENTERED...",
-            description=f"Welcome {member.mention} to **{member.guild.name}**!\n"
-                        f"You are the **{count}{suffix}** trapped member in Mario's cartridge. There is no escape.. WAHOOO!! <:mxsmile:1538591783645220965> ",
-            color=discord.Color.red()
-        )
-        
-        # image n embed 
-        embed.set_image(url="https://images-ext-1.discordapp.net/external/X9exZh596qntc15b6gERDH-PnS_xYOO32ibmRyYHOF0/%3Fq%3Dtbn%3AANd9GcQhG75XaBENR78fYYNUPjKxVef6zfX3dXTaaOAndsFQ2g%26s%3D10/https/encrypted-tbn0.gstatic.com/images?format=webp")
-        embed.set_thumbnail(url=member.display_avatar.url)
-        
-        await channel.send(embed=embed)
 
-      
 # /help command
 @bot.tree.command(name="help", description="Learn how to use MX Archive")
 async def help_command(interaction: discord.Interaction):
@@ -230,7 +206,7 @@ async def on_message(message: discord.Message):
     for song_title, gif_url in SONG_TRIGGERS.items():
         if song_title in content_lower:
             embed = discord.Embed(
-                title=f"👀 Did someone say {song_title.title()}???",
+                title=f" Did someone say {song_title.title()}?? 👀👀",
                 color=discord.Color.red()
             )
             embed.set_image(url=gif_url)
@@ -239,19 +215,6 @@ async def on_message(message: discord.Message):
 
     await bot.process_commands(message)
 
-# leave the fuckass server
-
-@bot.event
-async def on_ready():
-    print(f'Logged in as {bot.user}')
-    
-    # Replace with the actual target Server ID (as an integer, no quotes)
-    target_guild_id = 1495160136015151164
-    
-    guild = bot.get_guild(target_guild_id)
-    if guild:
-        await guild.leave()
-        print(f"Successfully left {guild.name}")
 
 # embed builder command
 class EmbedBuilderModal(discord.ui.Modal, title="Custom Embed Builder"):
